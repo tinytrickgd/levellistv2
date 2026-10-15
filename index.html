@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny TCD Levels List</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --panel-bg: #121212;
+            --panel-alt: #1a1a1a;
+            --border-color: #262626;
+            --accent: #ff6600;
+            --accent-hover: #ff8533;
+            --discord: #5865F2;
+            --discord-hover: #4752C4;
+            --youtube: #FF0000;
+            --youtube-hover: #CC0000;
+            --tiktok: #111111;
+            --tiktok-hover: #222222;
+            --text-main: #f0f0f0;
+            --text-muted: #888888;
+            --danger: #e6004c;
+            --info-blue: #0088cc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        header { background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1000; }
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        .subtitle { font-size: 0.8rem; color: var(--text-muted); }
+        nav { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+        /* MOD BAR (top of page, only visible for list mods) */
+        .mod-bar { display: none; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.6rem 2rem; background: linear-gradient(90deg, rgba(255,102,0,0.22), rgba(255,102,0,0.08)); border-bottom: 1px solid var(--accent); font-weight: 700; font-size: 0.9rem; position: relative; z-index: 999; }
+
+        button, .btn { background-color: var(--panel-alt); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: 0.15s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+        button:hover, .btn:hover { border-color: var(--accent); }
+        button.primary, .btn.primary { background-color: var(--accent); color: #fff; border-color: var(--accent); }
+
+        #lang-select { background-color: var(--panel-alt); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.5rem 0.5rem; font-size: 0.85rem; font-weight: 600; border-radius: 4px; cursor: pointer; }
+        #lang-select:hover { border-color: var(--accent); }
+
+        .header-custom-tab { background: transparent; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0.25rem 0.5rem; transition: opacity 0.2s; position: relative; }
+        .header-custom-tab:hover { opacity: 0.8; }
+        .header-custom-tab span.top-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .header-custom-tab span.main-label { font-size: 0.95rem; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+
+        .dropdown-container { position: relative; display: inline-block; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background-color: var(--panel-bg); border: 1px solid var(--border-color); min-width: 200px; box-shadow: 0px 8px 16px rgba(0,0,0,0.5); z-index: 2000; border-radius: 4px; overflow: hidden; margin-top: 0.25rem; }
+        .dropdown-container:hover .dropdown-menu { display: block; }
+        .dropdown-item { color: var(--text-main); padding: 0.75rem 1rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 700; transition: background 0.15s, color 0.15s; cursor: pointer; border-bottom: 1px solid var(--border-color); }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background-color: var(--panel-alt); color: var(--accent); }
+
+        .header-social { color: #fff; font-weight: 700; }
+        .header-social.discord { background-color: var(--discord); border-color: var(--discord); }
+        .header-social.discord:hover { background-color: var(--discord-hover); }
+        .header-social.youtube { background-color: var(--youtube); border-color: var(--youtube); }
+        .header-social.youtube:hover { background-color: var(--youtube-hover); }
+        .header-social.tiktok { background-color: var(--tiktok); border-color: #333; }
+        .header-social.tiktok:hover { background-color: var(--tiktok-hover); }
+
+        .container { max-width: 1600px; margin: 0 auto; padding: 2rem; width: 100%; flex: 1; display: grid; grid-template-columns: 320px 1fr 280px; gap: 1.5rem; }
+        @media(max-width: 1150px) { .container { grid-template-columns: 300px 1fr; } .right-sidebar { grid-column: span 2; } }
+        @media(max-width: 800px) { .container { grid-template-columns: 1fr; } .right-sidebar { grid-column: span 1; } }
+
+        .sidebar { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; display: flex; flex-direction: column; max-height: 80vh; overflow: hidden; }
+        .list-tabs { display: grid; grid-template-columns: repeat(3, 1fr); background-color: var(--panel-alt); border-bottom: 1px solid var(--border-color); }
+        .list-tab-btn { background: transparent; border: none; padding: 0.75rem 0.25rem; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; }
+        .list-tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background-color: var(--panel-bg); }
+        .level-search { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
+        .level-search input { width: 100%; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem; color: var(--text-main); border-radius: 4px; }
+
+        .level-items { overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
+        .level-item { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+        .level-item:hover, .level-item.active { background-color: var(--panel-alt); }
+        .level-item.active { border-left: 3px solid var(--accent); }
+        .level-thumb-mini { width: 50px; height: 35px; border-radius: 3px; object-fit: cover; background: #000; }
+
+        .main-panel { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 2rem; overflow-y: auto; }
+        .level-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 4px; overflow: hidden; margin-bottom: 1.5rem; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .meta-card { background: var(--panel-alt); border: 1px solid var(--border-color); padding: 1rem; border-radius: 4px; }
+        .meta-card label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; }
+        .section-title { font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin: 1.5rem 0 1rem 0; }
+
+        .completions-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .completion-item { background: var(--panel-alt); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+
+        .right-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .side-card { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 1.5rem; text-align: center; }
+        .side-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .side-card p.desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin-bottom: 1rem; }
+        .divider-line { width: 100%; height: 1px; background-color: var(--border-color); margin: 0.75rem 0 1rem 0; }
+
+        .side-mods-list { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .side-mod-item { background: var(--panel-alt); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px; }
+
+        .guidelines-btn-custom { background-color: #0088cc; color: #ffffff; border: none; width: 100%; padding: 0.75rem; font-size: 0.95rem; font-weight: 700; border-radius: 4px; cursor: pointer; transition: background 0.2s; display: block; text-align: center; }
+        .guidelines-btn-custom:hover { background-color: #0077b3; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 1rem; }
+        .modal { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; width: 100%; max-width: 600px; padding: 2rem; max-height: 85vh; overflow-y: auto; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+        .form-group input, .form-group select { width: 100%; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.75rem; color: var(--text-main); border-radius: 4px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        #mod-page-view { display: none; width: 100%; max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .mod-editor-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 1.25rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .mod-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .mod-user-card { background: var(--panel-alt); border: 1px solid var(--border-color); padding: 1rem; border-radius: 6px; display: flex; align-items: center; gap: 0.75rem; }
+
+        #user-area-view { display: none; width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .user-area-nav { display: grid; grid-template-columns: 1fr 1fr; background: var(--panel-alt); border: 1px solid var(--border-color); border-radius: 4px 4px 0 0; margin-bottom: 1.5rem; }
+        .user-area-tab { padding: 1rem; text-align: center; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; background: transparent; border: none; font-size: 1rem; justify-content: center; }
+        .user-area-tab.active { background: var(--panel-bg); color: var(--text-main); border-bottom: 3px solid var(--accent); }
+        .user-area-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        @media(max-width:850px) { .user-area-layout { grid-template-columns: 1fr; } }
+
+        .user-profile-box { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 2rem; }
+        .user-profile-title { font-size: 2rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .user-field-group { margin-bottom: 1.5rem; }
+        .user-field-title { font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem; }
+        .user-field-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        .btn-danger-large { background: var(--danger); color: #fff; border: none; font-weight: 700; padding: 0.75rem 1.25rem; border-radius: 4px; cursor: pointer; margin-top: 1rem; font-size: 1rem; }
+        .btn-danger-large:hover { opacity: 0.9; }
+        .btn-blue-large { background: var(--info-blue); color: #fff; border: none; font-weight: 700; padding: 0.75rem 1.25rem; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 1rem; justify-content: center; }
+        .btn-blue-large:hover { opacity: 0.9; }
+
+        .user-side-box { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+        .user-side-box h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-container" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <div>
+                <div class="logo">Tiny TCD Levels List</div>
+                <div class="subtitle" data-i18n="subtitle">demonlist ranked levels</div>
+            </div>
+
+            <!-- Geometry Dash DEMONLIST Dropdown Header Button -->
+            <div class="dropdown-container">
+                <button class="header-custom-tab">
+                    <span class="top-label">Geometry Dash</span>
+                    <span class="main-label">DEMONLIST ▼</span>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="dropdown-item" onclick="openModal('guidelines-modal')">📜 <span data-i18n="guidelines">Guidelines</span></div>
+                    <div class="dropdown-item" onclick="switchMainTab('leaderboard')">📊 <span data-i18n="statsViewer">Stats Viewer</span></div>
+                    <div class="dropdown-item" onclick="openModal('submit-modal')">📝 <span data-i18n="recordSubmitter">Record Submitter</span></div>
+                    <div class="dropdown-item" onclick="openModal('timemachine-modal')">⏳ <span data-i18n="timeMachine">Time Machine</span></div>
+                </div>
+            </div>
+
+            <!-- REST API Documentation Header Button -->
+            <button class="header-custom-tab" onclick="openModal('api-docs-modal')">
+                <span class="top-label" data-i18n="restApi">REST API</span>
+                <span class="main-label" data-i18n="documentation">Documentation</span>
+            </button>
+
+            <!-- TINY TCD LIST User Area Header Button -->
+            <button class="header-custom-tab" onclick="showUserAreaPage()">
+                <span class="top-label">TINY TCD LIST</span>
+                <span class="main-label" data-i18n="userArea">User Area</span>
+            </button>
+        </div>
+        <nav>
+            <button onclick="switchMainTab('list')" class="primary" id="nav-list-btn" data-i18n="lists">Lists</button>
+            <button onclick="switchMainTab('leaderboard')" id="nav-lb-btn" data-i18n="leaderboards">Leaderboards</button>
+            <button onclick="openModal('submit-modal')" data-i18n="submitRecord">Submit / Record</button>
+
+            <a href="https://discord.gg/gvM8HzCQQ" target="_blank" class="btn header-social discord">Discord</a>
+            <a href="https://www.youtube.com/@TinyTCD_Official" target="_blank" class="btn header-social youtube">YouTube</a>
+            <a href="https://tiktok.com/@tinytcd" target="_blank" class="btn header-social tiktok">TikTok</a>
+
+            <select id="lang-select" onchange="setLanguage(this.value)" aria-label="Language" title="Language">
+                <option value="en">🌐 English</option>
+                <option value="de">🌐 Deutsch</option>
+                <option value="es">🌐 Español</option>
+                <option value="fr">🌐 Français</option>
+                <option value="ru">🌐 Русский</option>
+                <option value="pl">🌐 Polski</option>
+                <option value="ro">🌐 Română</option>
+                <option value="it">🌐 Italiano</option>
+                <option value="el">🌐 Ελληνικά</option>
+            </select>
+
+            <div id="user-auth-area">
+                <button onclick="openModal('auth-modal')" id="login-register-btn" data-i18n="loginRegister">Login / Register</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MOD BAR: shown at the very top (under the header) for List Mods only -->
+    <div class="mod-bar" id="mod-bar">
+        <span>🛡️ <span data-i18n="modBarText">You are a List Moderator.</span></span>
+        <button class="primary" onclick="openModModal()">🛠️ <span data-i18n="openModPanel">Open Mod Panel</span></button>
+    </div>
+
+    <div class="container" id="main-container">
+        <aside class="sidebar" id="sidebar-container">
+            <div class="list-tabs">
+                <button class="list-tab-btn active" onclick="switchListCategory('main')" id="tab-main" data-i18n="tabMain">Main (#1-75)</button>
+                <button class="list-tab-btn" onclick="switchListCategory('extended')" id="tab-extended" data-i18n="tabExt">Extended (#76-150)</button>
+                <button class="list-tab-btn" onclick="switchListCategory('leg')" id="tab-leg" data-i18n="tabLeg">Legacy</button>
+            </div>
+            <div class="level-search">
+                <input type="text" id="level-search-input" data-i18n-ph="searchLevel" placeholder="Search level..." oninput="filterLevels()">
+            </div>
+            <div class="level-items" id="level-items-list"></div>
+        </aside>
+
+        <main class="main-panel" id="main-panel-content"></main>
+
+        <aside class="right-sidebar" id="right-sidebar-container">
+            <div class="side-card">
+                <h3 data-i18n="listMods">List Moderators</h3>
+                <div class="divider-line"></div>
+                <p class="desc" data-i18n="listModsDesc">Contact any of these moderators for list issues or edits.</p>
+                <div class="side-mods-list" id="side-mods-display">
+                    <div class="side-mod-item">TinyDoggie</div>
+                </div>
+            </div>
+
+            <div class="side-card">
+                <h3 data-i18n="guidelines">Guidelines</h3>
+                <div class="divider-line"></div>
+                <p class="desc" data-i18n="guidelinesDesc">Check guidelines before submitting records!</p>
+                <button class="guidelines-btn-custom" onclick="openModal('guidelines-modal')" data-i18n="readGuidelines">Read the guidelines!</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- TIME MACHINE MODAL -->
+    <div class="modal-overlay" id="timemachine-modal">
+        <div class="modal" style="max-width:700px;">
+            <h2>⏳ <span data-i18n="timeMachine">Time Machine</span></h2>
+            <div class="divider-line"></div>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">Select a date in the past to view what the Demonlist looked like on that day and see what changes have happened since!</p>
+
+            <div class="form-group">
+                <label>Snapshot</label>
+                <select id="timemachine-date-select" onchange="renderTimeMachineSnapshot()">
+                    <option value="today">Today (Live List)</option>
+                </select>
+            </div>
+
+            <div id="timemachine-content" style="background:var(--bg-color); border:1px solid var(--border-color); border-radius:6px; padding:1rem; max-height:350px; overflow-y:auto; margin-top:1rem;">
+                <p style="color:var(--text-muted); text-align:center;">Select a snapshot date above.</p>
+            </div>
+
+            <div style="margin-top:1.5rem; text-align:right;">
+                <button class="primary" onclick="closeModal('timemachine-modal')" data-i18n="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TINY TCD LIST USER AREA VIEW PAGE -->
+    <div id="user-area-view">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h1 style="font-size: 1.8rem; font-weight: 800;">Tiny TCD List - <span data-i18n="userArea">User Area</span></h1>
+            <button class="primary" onclick="exitUserAreaPage()" data-i18n="returnToList">Return to List</button>
+        </div>
+
+        <div class="user-area-nav">
+            <button class="user-area-tab active"><span data-i18n="profile">Profile</span>&nbsp;👤</button>
+            <button class="user-area-tab" onclick="alert('List Integration feature available for integrated accounts.')">List Integration&nbsp;📋</button>
+        </div>
+
+        <div id="user-area-content"></div>
+    </div>
+
+    <!-- REST API Documentation Modal -->
+    <div class="modal-overlay" id="api-docs-modal">
+        <div class="modal" style="max-width: 700px;">
+            <h2>📖 REST API <span data-i18n="documentation">Documentation</span></h2>
+            <div class="divider-line"></div>
+            <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-main); display: flex; flex-direction: column; gap: 1rem;">
+                <p>You can fetch live Tiny TCD Levels List data programmatically using our public endpoint.</p>
+
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.25rem;">1. Get All Levels & Leaderboards</h3>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.25rem;">Endpoint URL:</p>
+                    <code style="background: var(--bg-color); padding: 0.4rem; display: block; border-radius: 4px; font-size: 0.8rem; color: #ff8533;"id="api-doc-url">GET</code>
+                </div>
+
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.25rem;">2. Authentication</h3>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.25rem;">No key is needed to read the public list data:</p>
+                    <code style="background: var(--bg-color); padding: 0.4rem; display: block; border-radius: 4px; font-size: 0.8rem; color: #ff8533;">No headers required</code>
+                </div>
+
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.25rem;">3. Response Schema</h3>
+                    <p style="color: var(--text-muted);">Returns a JSON object with the `levels` array and `mods` (the list moderators' names). Accounts, passwords and pending submissions are never public.</p>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button class="primary" onclick="closeModal('api-docs-modal')" data-i18n="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Account Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <h2>⚙️ <span data-i18n="settings">Settings</span></h2>
+            <div class="divider-line"></div>
+
+            <div class="form-group">
+                <label data-i18n="username">Username</label>
+                <input type="text" id="setting-username">
+            </div>
+            <div class="form-group">
+                <label data-i18n="country">Country</label>
+                <select id="setting-country"></select>
+            </div>
+
+            <div style="margin-top:1.5rem; border-top:1px solid var(--border-color); padding-top:1rem;">
+                <h3 style="font-size:1rem; color:var(--accent); margin-bottom:0.5rem;">🔑 Claim Previous Level Verification</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">If you uploaded/verified a level under an old account, claim ownership using your previous password!</p>
+                <div class="form-group">
+                    <label>Old Account Username</label>
+                    <input type="text" id="claim-old-user" placeholder="Old username">
+                </div>
+                <div class="form-group">
+                    <label>Old Account Password</label>
+                    <input type="password" id="claim-old-pass" placeholder="Enter old password">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="levelId">Level ID</label>
+                    <input type="text" id="claim-level-id" placeholder="e.g. 150515146">
+                </div>
+                <button onclick="claimPreviousVerification()" style="width:100%; background:var(--panel-alt); border-color:var(--accent); justify-content:center;">Claim Verification Ownership</button>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="primary" onclick="saveUserSettings()" data-i18n="save">Save</button>
+                <button onclick="closeModal('settings-modal')" data-i18n="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mod Dashboard View -->
+    <div id="mod-page-view">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem;">
+            <div>
+                <h1>🛠️ <span data-i18n="modDashboard">Moderator Dashboard</span></h1>
+                <p style="color: var(--text-muted)" data-i18n="modDashDesc">Manage list rankings, re-add levels with full metadata, approve entries, and view active list moderators.</p>
+            </div>
+            <button class="primary" onclick="exitModPage()" data-i18n="exitDashboard">Exit Dashboard</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+                <div style="background:var(--panel-bg); border:1px solid var(--border-color); border-radius:6px; padding:1.25rem; margin-bottom:2rem;">
+                    <h2 class="section-title" style="margin-top:0;">➕ <span data-i18n="restoreTitle">Restore / Re-Add Level</span></h2>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Directly restore or re-add a level with all its exact metadata (video link, objects, verifier, etc.)</p>
+
+                    <div class="form-row">
+                        <div class="form-group"><label data-i18n="levelName">Level Name</label><input type="text" id="readd-name" placeholder="e.g. Tiny Grief"></div>
+                        <div class="form-group"><label data-i18n="levelId">Level ID</label><input type="text" id="readd-id" placeholder="e.g. 10482915"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label data-i18n="creator">Creator</label><input type="text" id="readd-creator" placeholder="e.g. CreatorName"></div>
+                        <div class="form-group"><label data-i18n="verifier">Verifier</label><input type="text" id="readd-verifier" placeholder="e.g. VerifierName"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-i18n="difficulty">In-Game Difficulty</label>
+                            <select id="readd-diff">
+                                <option value="Extreme Demon">Extreme Demon</option>
+                                <option value="Insane Demon">Insane Demon</option>
+                                <option value="Hard Demon">Hard Demon</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label data-i18n="gdUpdate">GD Update</label><input type="text" id="readd-update" value="2.2"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label data-i18n="song">Song</label><input type="text" id="readd-song" placeholder="Song title"></div>
+                        <div class="form-group"><label data-i18n="length">Length</label><input type="text" id="readd-length" placeholder="e.g. 1m 45s"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label data-i18n="objects">Objects</label><input type="text" id="readd-objects" placeholder="e.g. 45000"></div>
+                        <div class="form-group"><label data-i18n="password">Password</label><input type="text" id="readd-pass" placeholder="e.g. Free or 123456"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Target Rank</label><input type="number" id="readd-rank" value="1"></div>
+                        <div class="form-group"><label data-i18n="listReq">Req %</label><input type="number" id="readd-req" value="100"></div>
+                    </div>
+                    <div class="form-group"><label data-i18n="youtubeLink">YouTube Proof Video Link</label><input type="text" id="readd-video" placeholder="https://youtube.com/watch?v=..."></div>
+
+                    <button class="primary" onclick="readdLevelDirect()" style="width:100%; margin-top:0.5rem; justify-content:center;" data-i18n="readdBtn">Re-Add Level to List</button>
+                </div>
+
+                <h2 class="section-title">📥 <span data-i18n="pendingQueue">Pending Queue</span></h2>
+                <div id="mod-page-pending-list" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;"></div>
+
+                <h2 class="section-title">🛡️ <span data-i18n="activeMods">Active List Moderators</span></h2>
+                <div id="mod-staff-directory" class="mod-list-grid"></div>
+            </div>
+
+            <div>
+                <h2 class="section-title">📊 <span data-i18n="reorder">Re-Order Levels & Ranks</span></h2>
+                <div id="mod-page-level-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guidelines Modal -->
+    <div class="modal-overlay" id="guidelines-modal">
+        <div class="modal">
+            <h2>📜 <span data-i18n="guidelinesTitle">Submission Guidelines & Rules</span></h2>
+            <div class="divider-line"></div>
+            <div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); display: flex; flex-direction: column; gap: 1rem;">
+                <p data-i18n="gIntro">All demonlist operations are carried out in accordance with our guidelines. Please read carefully before submitting a level or record!</p>
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.35rem;" data-i18n="g1t">1. Level Eligibility</h3>
+                    <p style="color: var(--text-muted);" data-i18n="g1">Levels do not have to be tiny! You can submit any level that you have beaten or verified (Hard Demon or harder).</p>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.35rem;" data-i18n="g2t">2. Raw Footage & Audio Clicks</h3>
+                    <p style="color: var(--text-muted);" data-i18n="g2">Real-time audio clicks or taps are strictly required for all submissions. No click mods, macros, or edited audio allowed.</p>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.35rem;" data-i18n="g3t">3. Proof Video Quality</h3>
+                    <p style="color: var(--text-muted);" data-i18n="g3">Video proof must show full unedited gameplay from level start to end screen with clear video quality (720p or higher recommended).</p>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 0.35rem;" data-i18n="g4t">4. Allowed Modifications</h3>
+                    <p style="color: var(--text-muted);" data-i18n="g4">Standard cosmetic physics/FPS bypass mods are permitted, but hack menus, speedhacks, or frame-steppers will result in an immediate ban.</p>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button class="primary" onclick="closeModal('guidelines-modal')" data-i18n="understand">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal with Discord Integration -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal">
+            <h2 data-i18n="userAccount">User Account</h2>
+            <div id="auth-forms">
+                <div class="form-group">
+                    <label data-i18n="username">Username</label>
+                    <input type="text" id="auth-username" placeholder="Your Geometry Dash name">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="password">Password</label>
+                    <input type="password" id="auth-password">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="country">Country</label>
+                    <select id="auth-country"></select>
+                </div>
+
+                <div style="margin: 1.5rem 0; text-align: center; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <button class="btn header-social discord" onclick="loginWithDiscord()" style="width: 100%; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a74.57,74.57,0,0,0,64.3,0c.87.68,1.76,1.36,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77.5,77.5,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-18.91-72.13ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74C48.81,40.23,53.9,45.92,53.8,53,53.8,60,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74C91,40.23,96.12,45.92,96,53,96,60,90.93,65.69,84.69,65.69Z"/></svg>
+                        <span data-i18n="signInDiscord">Sign in with Discord</span>
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button class="primary" onclick="handleLogin()" data-i18n="login">Login</button>
+                    <button onclick="handleRegister()" data-i18n="register">Register</button>
+                    <button onclick="closeModal('auth-modal')" style="margin-left: auto;" data-i18n="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal-overlay" id="submit-modal">
+        <div class="modal">
+            <h2 data-i18n="submitTitle">Submit Level or Record</h2>
+            <div class="form-group">
+                <label data-i18n="subType">Submission Type</label>
+                <select id="sub-type" onchange="toggleSubmissionType()">
+                    <option value="tiny-level" data-i18n="subTinyLevel">New Tiny Level Suggestion</option>
+                    <option value="level" data-i18n="subLevel">New Level Suggestion (Hard Demon+)</option>
+                    <option value="tiny-record" data-i18n="subTinyRecord">New Tiny Level Record</option>
+                    <option value="record" data-i18n="subRecord">New Level Record</option>
+                </select>
+            </div>
+
+            <div id="sub-level-fields">
+                <div class="form-row">
+                    <div class="form-group"><label data-i18n="levelName">Level Name</label><input type="text" id="sl-name"></div>
+                    <div class="form-group"><label data-i18n="levelId">Level ID</label><input type="text" id="sl-id"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label data-i18n="creator">Creator</label><input type="text" id="sl-creator"></div>
+                    <div class="form-group"><label data-i18n="verifier">Verifier</label><input type="text" id="sl-verifier"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label data-i18n="difficulty">In-Game Difficulty</label>
+                        <select id="sl-diff">
+                            <option value="Hard Demon">Hard Demon</option>
+                            <option value="Insane Demon">Insane Demon</option>
+                            <option value="Extreme Demon">Extreme Demon</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label data-i18n="gdUpdate">GD Update</label><input type="text" id="sl-update" placeholder="e.g. 2.2"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label data-i18n="song">Song</label><input type="text" id="sl-song"></div>
+                    <div class="form-group"><label data-i18n="length">Length</label><input type="text" id="sl-length"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label data-i18n="objects">Objects</label><input type="text" id="sl-objects"></div>
+                    <div class="form-group"><label data-i18n="password">Password</label><input type="text" id="sl-pass"></div>
+                </div>
+                <div class="form-group"><label data-i18n="listReq">List Req %</label><input type="number" id="sl-req" value="70"></div>
+                <div class="form-group"><label data-i18n="youtubeLink">YouTube Link</label><input type="text" id="sl-video"></div>
+            </div>
+
+            <div id="sub-record-fields" style="display: none;">
+                <div class="form-group"><label data-i18n="selectLevel">Select Level</label><select id="sr-level-select"></select></div>
+                <div class="form-group"><label data-i18n="achieved">Achieved %</label><input type="number" id="sr-percent" value="100"></div>
+                <div class="form-group"><label data-i18n="youtubeLink">YouTube Video Link</label><input type="text" id="sr-video"></div>
+            </div>
+
+            <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; margin-top:1rem;">
+                <input type="checkbox" id="sub-clicks" required style="width:auto;">
+                <label for="sub-clicks" style="margin-bottom:0" data-i18n="audioClicks">Includes real-time audio clicks (No click mods)</label>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="primary" onclick="submitEntry()" data-i18n="submit">Submit</button>
+                <button onclick="closeModal('submit-modal')" data-i18n="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mod Request Modal -->
+    <div class="modal-overlay" id="mod-request-modal">
+        <div class="modal">
+            <h2>Request List Moderator Status</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.5; margin-bottom:1.5rem;">
+                To become a moderator, connect your Discord account and submit a request in the server.<br><br>
+                <strong>Requirements:</strong><br>
+                1. Hold the <strong>List Mod Potential</strong> role on Discord.<br>
+                2. Run <code>/requestmod username:your_username</code> in the Discord server.<br>
+                3. Existing List Mods will review and approve your application directly in Discord DMs!
+            </p>
+            <div style="display:flex; justify-content:flex-end;">
+                <button class="primary" onclick="closeModal('mod-request-modal')" data-i18n="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           CONFIG
+        ============================================================ */
+        // URL of your Cloudflare Worker (see worker.js). Nothing secret lives in this file.
+        const API_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
+
+        const DISCORD_CLIENT_ID = "1559649196272001064";
+        const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
+
+        // Session token issued by the worker after login. List Mod status is decided ONLY by the worker.
+        let sessionToken = localStorage.getItem('tcd_token') || null;
+        localStorage.removeItem('tcd_user'); // old versions stored the whole account here
+
+        let currentUser = null;   // { username, country, isMod, discordLinked, youtube } from the worker
+        let levels = [];
+        let submissions = [];     // only filled for mods
+        let modNames = [];
+        let dataLoaded = false;
+        let snapshots = JSON.parse(localStorage.getItem('tcd_snapshots')) || {};
+
+        let currentCategory = 'main';
+        let selectedLevelId = null;
+        let currentMainTab = 'list';
+        let pendingSettings = false;
+
+        // Escape anything a user typed before putting it into HTML
+        function esc(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : '#'; }
+
+        function requireMod() {
+            if (!currentUser || !currentUser.isMod) { alert(t('aOnlyMods')); return false; }
+            return true;
+        }
+
+        async function api(path, body) {
+            const opts = { method: body === undefined ? 'GET' : 'POST', headers: {} };
+            if (sessionToken) opts.headers['Authorization'] = 'Bearer ' + sessionToken;
+            if (body !== undefined) {
+                opts.headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(API_URL + path, opts);
+            let data = {};
+            try { data = await res.json(); } catch (e) { /* no body */ }
+            if (!res.ok) {
+                const err = new Error(data.error || `Request failed (${res.status})`);
+                err.status = res.status;
+                throw err;
+            }
+            return data;
+        }
+
+        /* ============================================================
+           TRANSLATIONS (missing keys fall back to English)
+        ============================================================ */
+        const T = {
+            en: {
+                subtitle: "demonlist ranked levels", guidelines: "Guidelines", statsViewer: "Stats Viewer", recordSubmitter: "Record Submitter", timeMachine: "Time Machine",
+                restApi: "REST API", documentation: "Documentation", userArea: "User Area", lists: "Lists", leaderboards: "Leaderboards", submitRecord: "Submit / Record",
+                loginRegister: "Login / Register", logout: "Logout", searchLevel: "Search level...", tabMain: "Main (#1-75)", tabExt: "Extended (#76-150)", tabLeg: "Legacy",
+                listMods: "List Moderators", listModsDesc: "Contact any of these moderators for list issues or edits.", guidelinesDesc: "Check guidelines before submitting records!",
+                readGuidelines: "Read the guidelines!", modBarText: "You are a List Moderator.", openModPanel: "Open Mod Panel",
+                username: "Username", password: "Password", country: "Country", login: "Login", register: "Register", cancel: "Cancel", close: "Close", submit: "Submit",
+                signInDiscord: "Sign in with Discord", userAccount: "User Account", submitTitle: "Submit Level or Record", subType: "Submission Type",
+                subTinyLevel: "New Tiny Level Suggestion", subLevel: "New Level Suggestion (Hard Demon+)", subTinyRecord: "New Tiny Level Record", subRecord: "New Level Record",
+                levelName: "Level Name", levelId: "Level ID", creator: "Creator", verifier: "Verifier", difficulty: "In-Game Difficulty", gdUpdate: "GD Update", song: "Song",
+                length: "Length", objects: "Objects", listReq: "List Req %", youtubeLink: "YouTube Link", selectLevel: "Select Level", achieved: "Achieved %",
+                audioClicks: "Includes real-time audio clicks (No click mods)", createdBy: "Created by", verifiedBy: "Verified by", listPoints: "List Points",
+                completions: "Completions", noCompletions: "No completions recorded yet.", proofVideo: "Proof Video", noLevelsTitle: "No Levels Added Yet",
+                noLevelsDesc: "Submit a level you've beaten or log in as a moderator.", noLevelsList: "No levels on this list", modPanel: "Mod Panel",
+                playerLeaderboards: "Player Leaderboards", rank: "RANK", player: "PLAYER", points: "POINTS", noRecords: "No records available.",
+                modDashboard: "Moderator Dashboard", modDashDesc: "Manage list rankings, re-add levels with full metadata, approve entries, and view active list moderators.",
+                exitDashboard: "Exit Dashboard", restoreTitle: "Restore / Re-Add Level", readdBtn: "Re-Add Level to List", pendingQueue: "Pending Queue",
+                activeMods: "Active List Moderators", reorder: "Re-Order Levels & Ranks", accept: "Accept", reject: "Reject", noPending: "No pending submissions.",
+                noMods: "No active moderators found.", noLevelsPub: "No levels published.", returnToList: "Return to List", profile: "Profile",
+                notSignedIn: "You are not signed in", deleteAccount: "Delete My Account", getToken: "Get access token", permissions: "Permissions:",
+                standardMember: "Standard Member", listModStaff: "List Moderator / Staff", language: "Language", settings: "Settings", save: "Save",
+                guidelinesTitle: "Submission Guidelines & Rules",
+                gIntro: "All demonlist operations are carried out in accordance with our guidelines. Please read carefully before submitting a level or record!",
+                g1t: "1. Level Eligibility", g1: "Levels do not have to be tiny! You can submit any level that you have beaten or verified (Hard Demon or harder).",
+                g2t: "2. Raw Footage & Audio Clicks", g2: "Real-time audio clicks or taps are strictly required for all submissions. No click mods, macros, or edited audio allowed.",
+                g3t: "3. Proof Video Quality", g3: "Video proof must show full unedited gameplay from level start to end screen with clear video quality (720p or higher recommended).",
+                g4t: "4. Allowed Modifications", g4: "Standard cosmetic physics/FPS bypass mods are permitted, but hack menus, speedhacks, or frame-steppers will result in an immediate ban.",
+                understand: "I Understand", aFill: "Fill out fields.", aExists: "Username exists!", aInvalid: "Invalid credentials.", aSubmitted: "Submitted to moderators!",
+                aOnlyMods: "Only List Mods can do this.", aSigned: "Signed in as:", other: "Other", logoutBtn: "Logout", logoutDesc: "Log out of your Tiny TCD List account in this browser."
+            },
+            de: {
+                subtitle: "Demonlist-Rangliste", guidelines: "Richtlinien", statsViewer: "Statistiken", recordSubmitter: "Rekord einreichen", timeMachine: "Zeitmaschine",
+                restApi: "REST-API", documentation: "Dokumentation", userArea: "Benutzerbereich", lists: "Listen", leaderboards: "Bestenlisten", submitRecord: "Einreichen / Rekord",
+                loginRegister: "Anmelden / Registrieren", logout: "Abmelden", searchLevel: "Level suchen...", tabMain: "Haupt (#1-75)", tabExt: "Erweitert (#76-150)", tabLeg: "Legacy",
+                listMods: "Listen-Moderatoren", listModsDesc: "Kontaktiere diese Moderatoren bei Problemen oder Änderungswünschen.", guidelinesDesc: "Lies die Richtlinien, bevor du Rekorde einreichst!",
+                readGuidelines: "Richtlinien lesen!", modBarText: "Du bist Listen-Moderator.", openModPanel: "Mod-Panel öffnen",
+                username: "Benutzername", password: "Passwort", country: "Land", login: "Anmelden", register: "Registrieren", cancel: "Abbrechen", close: "Schließen", submit: "Einreichen",
+                signInDiscord: "Mit Discord anmelden", userAccount: "Benutzerkonto", submitTitle: "Level oder Rekord einreichen", subType: "Art der Einreichung",
+                subTinyLevel: "Neuer Tiny-Level-Vorschlag", subLevel: "Neuer Level-Vorschlag (Hard Demon+)", subTinyRecord: "Neuer Tiny-Level-Rekord", subRecord: "Neuer Level-Rekord",
+                levelName: "Levelname", levelId: "Level-ID", creator: "Ersteller", verifier: "Verifizierer", difficulty: "Schwierigkeit im Spiel", gdUpdate: "GD-Update", song: "Song",
+                length: "Länge", objects: "Objekte", listReq: "Mindest-%", youtubeLink: "YouTube-Link", selectLevel: "Level auswählen", achieved: "Erreichte %",
+                audioClicks: "Enthält Klickgeräusche in Echtzeit (keine Click-Mods)", createdBy: "Erstellt von", verifiedBy: "Verifiziert von", listPoints: "Listenpunkte",
+                completions: "Abschlüsse", noCompletions: "Noch keine Abschlüsse erfasst.", proofVideo: "Beweisvideo", noLevelsTitle: "Noch keine Levels hinzugefügt",
+                noLevelsDesc: "Reiche ein Level ein, das du geschafft hast, oder melde dich als Moderator an.", noLevelsList: "Keine Levels in dieser Liste", modPanel: "Mod-Panel",
+                playerLeaderboards: "Spieler-Bestenlisten", rank: "RANG", player: "SPIELER", points: "PUNKTE", noRecords: "Keine Einträge vorhanden.",
+                modDashboard: "Moderator-Dashboard", exitDashboard: "Dashboard verlassen", pendingQueue: "Warteschlange", activeMods: "Aktive Listen-Moderatoren",
+                accept: "Annehmen", reject: "Ablehnen", noPending: "Keine ausstehenden Einreichungen.", returnToList: "Zurück zur Liste", profile: "Profil",
+                notSignedIn: "Du bist nicht angemeldet", deleteAccount: "Mein Konto löschen", language: "Sprache", settings: "Einstellungen", save: "Speichern",
+                guidelinesTitle: "Einreichungsrichtlinien & Regeln",
+                g1t: "1. Level-Voraussetzungen", g1: "Levels müssen nicht tiny sein! Du kannst jedes Level einreichen, das du geschafft oder verifiziert hast (Hard Demon oder schwerer).",
+                g2t: "2. Rohmaterial & Klickgeräusche", g2: "Echtzeit-Klickgeräusche sind bei jeder Einreichung Pflicht. Keine Click-Mods, Makros oder bearbeiteten Audiodateien.",
+                g3t: "3. Qualität des Beweisvideos", g3: "Das Video muss das komplette, unbearbeitete Gameplay vom Start bis zum Endbildschirm in guter Qualität zeigen (720p oder höher empfohlen).",
+                g4t: "4. Erlaubte Modifikationen", g4: "Standardmäßige kosmetische Physik-/FPS-Mods sind erlaubt, Hack-Menüs, Speedhacks oder Frame-Stepper führen zum sofortigen Bann.",
+                understand: "Verstanden", aFill: "Bitte alle Felder ausfüllen.", aExists: "Benutzername existiert bereits!", aInvalid: "Ungültige Zugangsdaten.",
+                aSubmitted: "An die Moderatoren gesendet!", aOnlyMods: "Das können nur Listen-Moderatoren.", aSigned: "Angemeldet als:", other: "Andere"
+            },
+            es: {
+                subtitle: "clasificación de niveles de la demonlist", guidelines: "Normas", statsViewer: "Estadísticas", recordSubmitter: "Enviar récord", timeMachine: "Máquina del tiempo",
+                restApi: "API REST", documentation: "Documentación", userArea: "Área de usuario", lists: "Listas", leaderboards: "Clasificaciones", submitRecord: "Enviar / Récord",
+                loginRegister: "Iniciar sesión / Registrarse", logout: "Cerrar sesión", searchLevel: "Buscar nivel...", tabMain: "Principal (#1-75)", tabExt: "Extendida (#76-150)", tabLeg: "Legado",
+                listMods: "Moderadores de la lista", listModsDesc: "Contacta con estos moderadores para problemas o cambios en la lista.", guidelinesDesc: "¡Lee las normas antes de enviar récords!",
+                readGuidelines: "¡Lee las normas!", modBarText: "Eres moderador de la lista.", openModPanel: "Abrir panel de mod",
+                username: "Nombre de usuario", password: "Contraseña", country: "País", login: "Iniciar sesión", register: "Registrarse", cancel: "Cancelar", close: "Cerrar", submit: "Enviar",
+                signInDiscord: "Iniciar sesión con Discord", userAccount: "Cuenta de usuario", submitTitle: "Enviar nivel o récord", subType: "Tipo de envío",
+                subTinyLevel: "Nueva sugerencia de nivel Tiny", subLevel: "Nueva sugerencia de nivel (Hard Demon+)", subTinyRecord: "Nuevo récord de nivel Tiny", subRecord: "Nuevo récord de nivel",
+                levelName: "Nombre del nivel", levelId: "ID del nivel", creator: "Creador", verifier: "Verificador", difficulty: "Dificultad en el juego", gdUpdate: "Actualización de GD", song: "Canción",
+                length: "Duración", objects: "Objetos", listReq: "% requerido", youtubeLink: "Enlace de YouTube", selectLevel: "Seleccionar nivel", achieved: "% logrado",
+                audioClicks: "Incluye clics de audio en tiempo real (sin click mods)", createdBy: "Creado por", verifiedBy: "Verificado por", listPoints: "Puntos de lista",
+                completions: "Completados", noCompletions: "Aún no hay completados.", proofVideo: "Vídeo de prueba", noLevelsTitle: "Aún no hay niveles",
+                noLevelsDesc: "Envía un nivel que hayas superado o inicia sesión como moderador.", noLevelsList: "No hay niveles en esta lista", modPanel: "Panel de mod",
+                playerLeaderboards: "Clasificación de jugadores", rank: "PUESTO", player: "JUGADOR", points: "PUNTOS", noRecords: "No hay registros.",
+                modDashboard: "Panel de moderador", exitDashboard: "Salir del panel", pendingQueue: "Cola pendiente", activeMods: "Moderadores activos",
+                accept: "Aceptar", reject: "Rechazar", noPending: "No hay envíos pendientes.", returnToList: "Volver a la lista", profile: "Perfil",
+                notSignedIn: "No has iniciado sesión", deleteAccount: "Eliminar mi cuenta", language: "Idioma", settings: "Ajustes", save: "Guardar",
+                guidelinesTitle: "Normas y reglas de envío",
+                g1t: "1. Requisitos del nivel", g1: "¡Los niveles no tienen que ser pequeños! Puedes enviar cualquier nivel que hayas superado o verificado (Hard Demon o superior).",
+                g2t: "2. Grabación en bruto y clics de audio", g2: "Se exigen clics o toques de audio en tiempo real en todos los envíos. No se permiten click mods, macros ni audio editado.",
+                g3t: "3. Calidad del vídeo de prueba", g3: "El vídeo debe mostrar la partida completa sin editar, desde el inicio hasta la pantalla final, con buena calidad (se recomienda 720p o más).",
+                g4t: "4. Modificaciones permitidas", g4: "Se permiten mods cosméticos y de física/FPS estándar, pero los menús de hacks, speedhacks o frame-steppers provocarán un baneo inmediato.",
+                understand: "Entendido", aFill: "Rellena los campos.", aExists: "¡El nombre de usuario ya existe!", aInvalid: "Credenciales no válidas.",
+                aSubmitted: "¡Enviado a los moderadores!", aOnlyMods: "Solo los moderadores de la lista pueden hacer esto.", aSigned: "Sesión iniciada como:", other: "Otro"
+            },
+            fr: {
+                subtitle: "classement des niveaux de la demonlist", guidelines: "Règles", statsViewer: "Statistiques", recordSubmitter: "Soumettre un record", timeMachine: "Machine à remonter le temps",
+                restApi: "API REST", documentation: "Documentation", userArea: "Espace utilisateur", lists: "Listes", leaderboards: "Classements", submitRecord: "Soumettre / Record",
+                loginRegister: "Connexion / Inscription", logout: "Déconnexion", searchLevel: "Rechercher un niveau...", tabMain: "Principale (#1-75)", tabExt: "Étendue (#76-150)", tabLeg: "Héritage",
+                listMods: "Modérateurs de la liste", listModsDesc: "Contactez ces modérateurs pour tout problème ou modification de la liste.", guidelinesDesc: "Lisez les règles avant de soumettre des records !",
+                readGuidelines: "Lire les règles !", modBarText: "Vous êtes modérateur de la liste.", openModPanel: "Ouvrir le panneau de modération",
+                username: "Nom d'utilisateur", password: "Mot de passe", country: "Pays", login: "Connexion", register: "S'inscrire", cancel: "Annuler", close: "Fermer", submit: "Soumettre",
+                signInDiscord: "Se connecter avec Discord", userAccount: "Compte utilisateur", submitTitle: "Soumettre un niveau ou un record", subType: "Type de soumission",
+                subTinyLevel: "Nouvelle suggestion de niveau Tiny", subLevel: "Nouvelle suggestion de niveau (Hard Demon+)", subTinyRecord: "Nouveau record sur un niveau Tiny", subRecord: "Nouveau record sur un niveau",
+                levelName: "Nom du niveau", levelId: "ID du niveau", creator: "Créateur", verifier: "Vérificateur", difficulty: "Difficulté en jeu", gdUpdate: "Mise à jour GD", song: "Musique",
+                length: "Durée", objects: "Objets", listReq: "% requis", youtubeLink: "Lien YouTube", selectLevel: "Choisir un niveau", achieved: "% atteint",
+                audioClicks: "Inclut les clics audio en temps réel (sans click mods)", createdBy: "Créé par", verifiedBy: "Vérifié par", listPoints: "Points de liste",
+                completions: "Complétions", noCompletions: "Aucune complétion enregistrée.", proofVideo: "Vidéo de preuve", noLevelsTitle: "Aucun niveau ajouté",
+                noLevelsDesc: "Soumettez un niveau que vous avez battu ou connectez-vous en tant que modérateur.", noLevelsList: "Aucun niveau dans cette liste", modPanel: "Panneau de modération",
+                playerLeaderboards: "Classement des joueurs", rank: "RANG", player: "JOUEUR", points: "POINTS", noRecords: "Aucune donnée disponible.",
+                modDashboard: "Tableau de bord des modérateurs", exitDashboard: "Quitter le tableau de bord", pendingQueue: "File d'attente", activeMods: "Modérateurs actifs",
+                accept: "Accepter", reject: "Refuser", noPending: "Aucune soumission en attente.", returnToList: "Retour à la liste", profile: "Profil",
+                notSignedIn: "Vous n'êtes pas connecté", deleteAccount: "Supprimer mon compte", language: "Langue", settings: "Paramètres", save: "Enregistrer",
+                guidelinesTitle: "Règles et consignes de soumission",
+                g1t: "1. Éligibilité du niveau", g1: "Les niveaux n'ont pas besoin d'être tiny ! Vous pouvez soumettre tout niveau que vous avez battu ou vérifié (Hard Demon ou plus).",
+                g2t: "2. Séquence brute et clics audio", g2: "Les clics audio en temps réel sont obligatoires pour toute soumission. Pas de click mods, de macros ni d'audio modifié.",
+                g3t: "3. Qualité de la vidéo de preuve", g3: "La vidéo doit montrer la partie complète non montée, du début à l'écran de fin, avec une bonne qualité (720p ou plus recommandé).",
+                g4t: "4. Modifications autorisées", g4: "Les mods cosmétiques et de physique/FPS standards sont permis, mais les menus de hacks, speedhacks ou frame-steppers entraînent un bannissement immédiat.",
+                understand: "J'ai compris", aFill: "Remplissez les champs.", aExists: "Ce nom d'utilisateur existe déjà !", aInvalid: "Identifiants invalides.",
+                aSubmitted: "Envoyé aux modérateurs !", aOnlyMods: "Seuls les modérateurs de la liste peuvent faire cela.", aSigned: "Connecté en tant que :", other: "Autre"
+            },
+            ru: {
+                subtitle: "рейтинг уровней демонлиста", guidelines: "Правила", statsViewer: "Статистика", recordSubmitter: "Отправить рекорд", timeMachine: "Машина времени",
+                restApi: "REST API", documentation: "Документация", userArea: "Личный кабинет", lists: "Списки", leaderboards: "Таблицы лидеров", submitRecord: "Отправить / Рекорд",
+                loginRegister: "Вход / Регистрация", logout: "Выйти", searchLevel: "Поиск уровня...", tabMain: "Основной (#1-75)", tabExt: "Расширенный (#76-150)", tabLeg: "Наследие",
+                listMods: "Модераторы списка", listModsDesc: "Обращайтесь к этим модераторам по вопросам и правкам списка.", guidelinesDesc: "Прочитайте правила перед отправкой рекордов!",
+                readGuidelines: "Читать правила!", modBarText: "Вы модератор списка.", openModPanel: "Открыть панель модератора",
+                username: "Имя пользователя", password: "Пароль", country: "Страна", login: "Войти", register: "Регистрация", cancel: "Отмена", close: "Закрыть", submit: "Отправить",
+                signInDiscord: "Войти через Discord", userAccount: "Аккаунт пользователя", submitTitle: "Отправить уровень или рекорд", subType: "Тип заявки",
+                subTinyLevel: "Предложить новый Tiny-уровень", subLevel: "Предложить новый уровень (Hard Demon+)", subTinyRecord: "Новый рекорд на Tiny-уровне", subRecord: "Новый рекорд на уровне",
+                levelName: "Название уровня", levelId: "ID уровня", creator: "Создатель", verifier: "Верификатор", difficulty: "Сложность в игре", gdUpdate: "Обновление GD", song: "Песня",
+                length: "Длительность", objects: "Объекты", listReq: "Требуемый %", youtubeLink: "Ссылка на YouTube", selectLevel: "Выберите уровень", achieved: "Достигнутый %",
+                audioClicks: "Есть звуки кликов в реальном времени (без клик-модов)", createdBy: "Создатель:", verifiedBy: "Верификатор:", listPoints: "Очки списка",
+                completions: "Прохождения", noCompletions: "Прохождений пока нет.", proofVideo: "Видео-доказательство", noLevelsTitle: "Уровни пока не добавлены",
+                noLevelsDesc: "Отправьте пройденный уровень или войдите как модератор.", noLevelsList: "В этом списке нет уровней", modPanel: "Панель модератора",
+                playerLeaderboards: "Таблица лидеров игроков", rank: "МЕСТО", player: "ИГРОК", points: "ОЧКИ", noRecords: "Нет данных.",
+                modDashboard: "Панель модераторов", exitDashboard: "Выйти из панели", pendingQueue: "Очередь заявок", activeMods: "Активные модераторы",
+                accept: "Принять", reject: "Отклонить", noPending: "Нет ожидающих заявок.", returnToList: "Вернуться к списку", profile: "Профиль",
+                notSignedIn: "Вы не вошли в аккаунт", deleteAccount: "Удалить мой аккаунт", language: "Язык", settings: "Настройки", save: "Сохранить",
+                guidelinesTitle: "Правила подачи заявок",
+                g1t: "1. Допустимые уровни", g1: "Уровни не обязаны быть tiny! Можно отправить любой пройденный или верифицированный вами уровень (Hard Demon и выше).",
+                g2t: "2. Сырая запись и звуки кликов", g2: "Звуки кликов в реальном времени обязательны для всех заявок. Клик-моды, макросы и отредактированный звук запрещены.",
+                g3t: "3. Качество видео-доказательства", g3: "Видео должно показывать всё прохождение без монтажа от начала до экрана завершения в хорошем качестве (рекомендуется 720p и выше).",
+                g4t: "4. Разрешённые модификации", g4: "Стандартные косметические моды и моды физики/FPS разрешены, но хак-меню, спидхаки и фреймстепперы приведут к немедленному бану.",
+                understand: "Понятно", aFill: "Заполните поля.", aExists: "Такое имя пользователя уже существует!", aInvalid: "Неверные данные для входа.",
+                aSubmitted: "Отправлено модераторам!", aOnlyMods: "Это могут делать только модераторы списка.", aSigned: "Вы вошли как:", other: "Другая"
+            },
+            pl: {
+                subtitle: "ranking poziomów demonlisty", guidelines: "Zasady", statsViewer: "Statystyki", recordSubmitter: "Zgłoś rekord", timeMachine: "Wehikuł czasu",
+                restApi: "REST API", documentation: "Dokumentacja", userArea: "Strefa użytkownika", lists: "Listy", leaderboards: "Rankingi", submitRecord: "Zgłoś / Rekord",
+                loginRegister: "Zaloguj / Zarejestruj", logout: "Wyloguj", searchLevel: "Szukaj poziomu...", tabMain: "Główna (#1-75)", tabExt: "Rozszerzona (#76-150)", tabLeg: "Legacy",
+                listMods: "Moderatorzy listy", listModsDesc: "Skontaktuj się z moderatorami w sprawie problemów lub zmian na liście.", guidelinesDesc: "Przeczytaj zasady przed zgłoszeniem rekordów!",
+                readGuidelines: "Przeczytaj zasady!", modBarText: "Jesteś moderatorem listy.", openModPanel: "Otwórz panel moderatora",
+                username: "Nazwa użytkownika", password: "Hasło", country: "Kraj", login: "Zaloguj", register: "Zarejestruj", cancel: "Anuluj", close: "Zamknij", submit: "Wyślij",
+                signInDiscord: "Zaloguj przez Discord", userAccount: "Konto użytkownika", submitTitle: "Zgłoś poziom lub rekord", subType: "Rodzaj zgłoszenia",
+                subTinyLevel: "Propozycja nowego poziomu Tiny", subLevel: "Propozycja nowego poziomu (Hard Demon+)", subTinyRecord: "Nowy rekord na poziomie Tiny", subRecord: "Nowy rekord na poziomie",
+                levelName: "Nazwa poziomu", levelId: "ID poziomu", creator: "Twórca", verifier: "Weryfikator", difficulty: "Trudność w grze", gdUpdate: "Aktualizacja GD", song: "Piosenka",
+                length: "Długość", objects: "Obiekty", listReq: "Wymagane %", youtubeLink: "Link do YouTube", selectLevel: "Wybierz poziom", achieved: "Osiągnięte %",
+                audioClicks: "Zawiera kliknięcia audio w czasie rzeczywistym (bez click modów)", createdBy: "Stworzony przez", verifiedBy: "Zweryfikowany przez", listPoints: "Punkty listy",
+                completions: "Ukończenia", noCompletions: "Brak zarejestrowanych ukończeń.", proofVideo: "Film dowodowy", noLevelsTitle: "Nie dodano jeszcze poziomów",
+                noLevelsDesc: "Zgłoś poziom, który ukończyłeś, lub zaloguj się jako moderator.", noLevelsList: "Brak poziomów na tej liście", modPanel: "Panel moderatora",
+                playerLeaderboards: "Ranking graczy", rank: "MIEJSCE", player: "GRACZ", points: "PUNKTY", noRecords: "Brak dostępnych wpisów.",
+                modDashboard: "Panel moderatorów", exitDashboard: "Wyjdź z panelu", pendingQueue: "Kolejka oczekujących", activeMods: "Aktywni moderatorzy",
+                accept: "Zaakceptuj", reject: "Odrzuć", noPending: "Brak oczekujących zgłoszeń.", returnToList: "Wróć do listy", profile: "Profil",
+                notSignedIn: "Nie jesteś zalogowany", deleteAccount: "Usuń moje konto", language: "Język", settings: "Ustawienia", save: "Zapisz",
+                guidelinesTitle: "Zasady zgłaszania",
+                g1t: "1. Kwalifikowanie poziomów", g1: "Poziomy nie muszą być tiny! Możesz zgłosić dowolny poziom, który ukończyłeś lub zweryfikowałeś (Hard Demon lub trudniejszy).",
+                g2t: "2. Surowe nagranie i kliknięcia audio", g2: "Kliknięcia audio w czasie rzeczywistym są wymagane przy każdym zgłoszeniu. Zakaz click modów, makr i edytowanego dźwięku.",
+                g3t: "3. Jakość filmu dowodowego", g3: "Film musi pokazywać pełną, niemontowaną rozgrywkę od startu do ekranu końcowego w dobrej jakości (zalecane 720p lub więcej).",
+                g4t: "4. Dozwolone modyfikacje", g4: "Standardowe mody kosmetyczne i fizyki/FPS są dozwolone, ale menu hacków, speedhacki lub frame-steppery skutkują natychmiastowym banem.",
+                understand: "Rozumiem", aFill: "Wypełnij pola.", aExists: "Nazwa użytkownika już istnieje!", aInvalid: "Nieprawidłowe dane logowania.",
+                aSubmitted: "Wysłano do moderatorów!", aOnlyMods: "Tylko moderatorzy listy mogą to zrobić.", aSigned: "Zalogowano jako:", other: "Inny"
+            },
+            ro: {
+                subtitle: "clasamentul nivelelor demonlist", guidelines: "Reguli", statsViewer: "Statistici", recordSubmitter: "Trimite record", timeMachine: "Mașina timpului",
+                restApi: "API REST", documentation: "Documentație", userArea: "Zona utilizatorului", lists: "Liste", leaderboards: "Clasamente", submitRecord: "Trimite / Record",
+                loginRegister: "Autentificare / Înregistrare", logout: "Deconectare", searchLevel: "Caută nivel...", tabMain: "Principală (#1-75)", tabExt: "Extinsă (#76-150)", tabLeg: "Legacy",
+                listMods: "Moderatorii listei", listModsDesc: "Contactează acești moderatori pentru probleme sau modificări ale listei.", guidelinesDesc: "Citește regulile înainte de a trimite recorduri!",
+                readGuidelines: "Citește regulile!", modBarText: "Ești moderator al listei.", openModPanel: "Deschide panoul de moderator",
+                username: "Nume de utilizator", password: "Parolă", country: "Țara", login: "Autentificare", register: "Înregistrare", cancel: "Anulează", close: "Închide", submit: "Trimite",
+                signInDiscord: "Autentifică-te cu Discord", userAccount: "Cont de utilizator", submitTitle: "Trimite nivel sau record", subType: "Tipul trimiterii",
+                subTinyLevel: "Sugestie de nivel Tiny nou", subLevel: "Sugestie de nivel nou (Hard Demon+)", subTinyRecord: "Record nou la un nivel Tiny", subRecord: "Record nou la un nivel",
+                levelName: "Numele nivelului", levelId: "ID nivel", creator: "Creator", verifier: "Verificator", difficulty: "Dificultate în joc", gdUpdate: "Actualizare GD", song: "Melodie",
+                length: "Durată", objects: "Obiecte", listReq: "% necesar", youtubeLink: "Link YouTube", selectLevel: "Alege nivelul", achieved: "% obținut",
+                audioClicks: "Include clicuri audio în timp real (fără click mods)", createdBy: "Creat de", verifiedBy: "Verificat de", listPoints: "Puncte în listă",
+                completions: "Finalizări", noCompletions: "Nicio finalizare înregistrată încă.", proofVideo: "Video dovadă", noLevelsTitle: "Niciun nivel adăugat încă",
+                noLevelsDesc: "Trimite un nivel pe care l-ai terminat sau autentifică-te ca moderator.", noLevelsList: "Niciun nivel în această listă", modPanel: "Panou moderator",
+                playerLeaderboards: "Clasamentul jucătorilor", rank: "LOC", player: "JUCĂTOR", points: "PUNCTE", noRecords: "Nicio înregistrare disponibilă.",
+                modDashboard: "Panou moderatori", exitDashboard: "Ieși din panou", pendingQueue: "Coadă în așteptare", activeMods: "Moderatori activi",
+                accept: "Acceptă", reject: "Respinge", noPending: "Nicio trimitere în așteptare.", returnToList: "Înapoi la listă", profile: "Profil",
+                notSignedIn: "Nu ești autentificat", deleteAccount: "Șterge-mi contul", language: "Limbă", settings: "Setări", save: "Salvează",
+                guidelinesTitle: "Reguli de trimitere",
+                g1t: "1. Eligibilitatea nivelului", g1: "Nivelurile nu trebuie să fie tiny! Poți trimite orice nivel pe care l-ai terminat sau verificat (Hard Demon sau mai greu).",
+                g2t: "2. Înregistrare brută și clicuri audio", g2: "Clicurile audio în timp real sunt obligatorii pentru orice trimitere. Fără click mods, macro-uri sau audio editat.",
+                g3t: "3. Calitatea videoclipului dovadă", g3: "Videoclipul trebuie să arate jocul complet, needitat, de la început până la ecranul final, cu calitate bună (se recomandă 720p sau mai mult).",
+                g4t: "4. Modificări permise", g4: "Sunt permise modurile cosmetice și de fizică/FPS standard, dar meniurile de hack, speedhack-urile sau frame-stepper-ele duc la ban imediat.",
+                understand: "Am înțeles", aFill: "Completează câmpurile.", aExists: "Numele de utilizator există deja!", aInvalid: "Date de autentificare invalide.",
+                aSubmitted: "Trimis către moderatori!", aOnlyMods: "Doar moderatorii listei pot face asta.", aSigned: "Autentificat ca:", other: "Altă țară"
+            },
+            it: {
+                subtitle: "classifica dei livelli della demonlist", guidelines: "Linee guida", statsViewer: "Statistiche", recordSubmitter: "Invia record", timeMachine: "Macchina del tempo",
+                restApi: "API REST", documentation: "Documentazione", userArea: "Area utente", lists: "Liste", leaderboards: "Classifiche", submitRecord: "Invia / Record",
+                loginRegister: "Accedi / Registrati", logout: "Esci", searchLevel: "Cerca livello...", tabMain: "Principale (#1-75)", tabExt: "Estesa (#76-150)", tabLeg: "Legacy",
+                listMods: "Moderatori della lista", listModsDesc: "Contatta questi moderatori per problemi o modifiche alla lista.", guidelinesDesc: "Leggi le linee guida prima di inviare i record!",
+                readGuidelines: "Leggi le linee guida!", modBarText: "Sei un moderatore della lista.", openModPanel: "Apri il pannello mod",
+                username: "Nome utente", password: "Password", country: "Paese", login: "Accedi", register: "Registrati", cancel: "Annulla", close: "Chiudi", submit: "Invia",
+                signInDiscord: "Accedi con Discord", userAccount: "Account utente", submitTitle: "Invia livello o record", subType: "Tipo di invio",
+                subTinyLevel: "Nuovo suggerimento di livello Tiny", subLevel: "Nuovo suggerimento di livello (Hard Demon+)", subTinyRecord: "Nuovo record su livello Tiny", subRecord: "Nuovo record su livello",
+                levelName: "Nome del livello", levelId: "ID del livello", creator: "Creatore", verifier: "Verificatore", difficulty: "Difficoltà in gioco", gdUpdate: "Aggiornamento GD", song: "Canzone",
+                length: "Durata", objects: "Oggetti", listReq: "% richiesta", youtubeLink: "Link YouTube", selectLevel: "Seleziona livello", achieved: "% ottenuta",
+                audioClicks: "Include i click audio in tempo reale (niente click mod)", createdBy: "Creato da", verifiedBy: "Verificato da", listPoints: "Punti lista",
+                completions: "Completamenti", noCompletions: "Nessun completamento registrato.", proofVideo: "Video prova", noLevelsTitle: "Nessun livello aggiunto",
+                noLevelsDesc: "Invia un livello che hai completato oppure accedi come moderatore.", noLevelsList: "Nessun livello in questa lista", modPanel: "Pannello mod",
+                playerLeaderboards: "Classifica giocatori", rank: "POS.", player: "GIOCATORE", points: "PUNTI", noRecords: "Nessun record disponibile.",
+                modDashboard: "Dashboard moderatori", exitDashboard: "Esci dalla dashboard", pendingQueue: "Coda in attesa", activeMods: "Moderatori attivi",
+                accept: "Accetta", reject: "Rifiuta", noPending: "Nessun invio in attesa.", returnToList: "Torna alla lista", profile: "Profilo",
+                notSignedIn: "Non hai effettuato l'accesso", deleteAccount: "Elimina il mio account", language: "Lingua", settings: "Impostazioni", save: "Salva",
+                guidelinesTitle: "Linee guida e regole di invio",
+                g1t: "1. Idoneità del livello", g1: "I livelli non devono essere per forza tiny! Puoi inviare qualsiasi livello che hai completato o verificato (Hard Demon o superiore).",
+                g2t: "2. Filmato originale e click audio", g2: "I click audio in tempo reale sono obbligatori per ogni invio. Vietati click mod, macro o audio modificato.",
+                g3t: "3. Qualità del video prova", g3: "Il video deve mostrare la partita completa e non montata dall'inizio alla schermata finale, con buona qualità (consigliato 720p o superiore).",
+                g4t: "4. Modifiche consentite", g4: "Sono ammesse mod cosmetiche e di fisica/FPS standard, ma menu hack, speedhack o frame-stepper comportano il ban immediato.",
+                understand: "Ho capito", aFill: "Compila i campi.", aExists: "Nome utente già esistente!", aInvalid: "Credenziali non valide.",
+                aSubmitted: "Inviato ai moderatori!", aOnlyMods: "Solo i moderatori della lista possono farlo.", aSigned: "Accesso effettuato come:", other: "Altro"
+            },
+            el: {
+                subtitle: "κατάταξη επιπέδων demonlist", guidelines: "Οδηγίες", statsViewer: "Στατιστικά", recordSubmitter: "Υποβολή ρεκόρ", timeMachine: "Χρονομηχανή",
+                restApi: "REST API", documentation: "Τεκμηρίωση", userArea: "Περιοχή χρήστη", lists: "Λίστες", leaderboards: "Κατατάξεις", submitRecord: "Υποβολή / Ρεκόρ",
+                loginRegister: "Σύνδεση / Εγγραφή", logout: "Αποσύνδεση", searchLevel: "Αναζήτηση επιπέδου...", tabMain: "Κύρια (#1-75)", tabExt: "Εκτεταμένη (#76-150)", tabLeg: "Legacy",
+                listMods: "Διαχειριστές λίστας", listModsDesc: "Επικοινωνήστε με αυτούς τους διαχειριστές για θέματα ή αλλαγές στη λίστα.", guidelinesDesc: "Διαβάστε τις οδηγίες πριν υποβάλετε ρεκόρ!",
+                readGuidelines: "Διαβάστε τις οδηγίες!", modBarText: "Είστε διαχειριστής της λίστας.", openModPanel: "Άνοιγμα πίνακα διαχειριστή",
+                username: "Όνομα χρήστη", password: "Κωδικός", country: "Χώρα", login: "Σύνδεση", register: "Εγγραφή", cancel: "Ακύρωση", close: "Κλείσιμο", submit: "Υποβολή",
+                signInDiscord: "Σύνδεση με Discord", userAccount: "Λογαριασμός χρήστη", submitTitle: "Υποβολή επιπέδου ή ρεκόρ", subType: "Τύπος υποβολής",
+                subTinyLevel: "Πρόταση νέου Tiny επιπέδου", subLevel: "Πρόταση νέου επιπέδου (Hard Demon+)", subTinyRecord: "Νέο ρεκόρ σε Tiny επίπεδο", subRecord: "Νέο ρεκόρ σε επίπεδο",
+                levelName: "Όνομα επιπέδου", levelId: "ID επιπέδου", creator: "Δημιουργός", verifier: "Επαληθευτής", difficulty: "Δυσκολία στο παιχνίδι", gdUpdate: "Ενημέρωση GD", song: "Τραγούδι",
+                length: "Διάρκεια", objects: "Αντικείμενα", listReq: "Απαιτούμενο %", youtubeLink: "Σύνδεσμος YouTube", selectLevel: "Επιλογή επιπέδου", achieved: "Επιτευχθέν %",
+                audioClicks: "Περιλαμβάνει ήχους κλικ σε πραγματικό χρόνο (χωρίς click mods)", createdBy: "Δημιουργήθηκε από", verifiedBy: "Επαληθεύτηκε από", listPoints: "Πόντοι λίστας",
+                completions: "Ολοκληρώσεις", noCompletions: "Δεν έχουν καταγραφεί ολοκληρώσεις ακόμη.", proofVideo: "Βίντεο απόδειξης", noLevelsTitle: "Δεν έχουν προστεθεί επίπεδα",
+                noLevelsDesc: "Υποβάλετε ένα επίπεδο που ολοκληρώσατε ή συνδεθείτε ως διαχειριστής.", noLevelsList: "Δεν υπάρχουν επίπεδα σε αυτή τη λίστα", modPanel: "Πίνακας διαχειριστή",
+                playerLeaderboards: "Κατάταξη παικτών", rank: "ΘΕΣΗ", player: "ΠΑΙΚΤΗΣ", points: "ΠΟΝΤΟΙ", noRecords: "Δεν υπάρχουν διαθέσιμες εγγραφές.",
+                modDashboard: "Πίνακας διαχειριστών", exitDashboard: "Έξοδος από τον πίνακα", pendingQueue: "Ουρά εκκρεμοτήτων", activeMods: "Ενεργοί διαχειριστές",
+                accept: "Αποδοχή", reject: "Απόρριψη", noPending: "Δεν υπάρχουν εκκρεμείς υποβολές.", returnToList: "Επιστροφή στη λίστα", profile: "Προφίλ",
+                notSignedIn: "Δεν έχετε συνδεθεί", deleteAccount: "Διαγραφή του λογαριασμού μου", language: "Γλώσσα", settings: "Ρυθμίσεις", save: "Αποθήκευση",
+                guidelinesTitle: "Οδηγίες και κανόνες υποβολής",
+                g1t: "1. Επιλεξιμότητα επιπέδου", g1: "Τα επίπεδα δεν χρειάζεται να είναι tiny! Μπορείτε να υποβάλετε οποιοδήποτε επίπεδο έχετε ολοκληρώσει ή επαληθεύσει (Hard Demon ή πιο δύσκολο).",
+                g2t: "2. Ακατέργαστο υλικό και ήχοι κλικ", g2: "Οι ήχοι κλικ σε πραγματικό χρόνο απαιτούνται σε κάθε υποβολή. Απαγορεύονται τα click mods, τα macros και ο επεξεργασμένος ήχος.",
+                g3t: "3. Ποιότητα βίντεο απόδειξης", g3: "Το βίντεο πρέπει να δείχνει ολόκληρο το παιχνίδι χωρίς μοντάζ, από την αρχή ως την οθόνη τέλους, με καλή ποιότητα (προτείνεται 720p ή υψηλότερη).",
+                g4t: "4. Επιτρεπόμενες τροποποιήσεις", g4: "Επιτρέπονται τα τυπικά mods εμφάνισης και φυσικής/FPS, αλλά τα μενού hack, τα speedhacks ή τα frame-steppers οδηγούν σε άμεσο ban.",
+                understand: "Κατάλαβα", aFill: "Συμπληρώστε τα πεδία.", aExists: "Το όνομα χρήστη υπάρχει ήδη!", aInvalid: "Λανθασμένα στοιχεία σύνδεσης.",
+                aSubmitted: "Στάλθηκε στους διαχειριστές!", aOnlyMods: "Μόνο οι διαχειριστές της λίστας μπορούν να το κάνουν.", aSigned: "Συνδεθήκατε ως:", other: "Άλλη"
+            }
+        };
+
+        const SUPPORTED_LANGS = Object.keys(T);
+        let currentLang = 'en';
+
+        function t(key) {
+            return (T[currentLang] && T[currentLang][key]) || T.en[key] || key;
+        }
+
+        function detectLanguage() {
+            const saved = localStorage.getItem('tcd_lang');
+            if (saved && SUPPORTED_LANGS.includes(saved)) return saved;
+            const nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+            return SUPPORTED_LANGS.includes(nav) ? nav : 'en';
+        }
+
+        /* ============================================================
+           COUNTRIES (full ISO list, names localised via Intl.DisplayNames;
+           the stored value is always the English name)
+        ============================================================ */
+        const COUNTRY_CODES = "AF AX AL DZ AS AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY BE BZ BJ BM BT BO BQ BA BW BV BR IO BN BG BF BI CV KH CM CA KY CF TD CL CN CX CC CO KM CG CD CK CR CI HR CU CW CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FK FO FJ FI FR GF PF TF GA GM GE DE GH GI GR GL GD GP GU GT GG GN GW GY HT HM VA HN HK HU IS IN ID IR IQ IE IM IL IT JM JP JE JO KZ KE KI KP KR XK KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MQ MR MU YT MX FM MD MC MN ME MS MA MZ MM NA NR NP NL NC NZ NI NE NG NU NF MK MP NO OM PK PW PS PA PG PY PE PH PN PL PT PR QA RE RO RU RW BL SH KN LC MF PM VC WS SM ST SA SN RS SC SL SG SX SK SI SB SO ZA GS SS ES LK SD SR SJ SE CH SY TW TJ TZ TH TL TG TK TO TT TN TR TM TC TV UG UA AE GB US UM UY UZ VU VE VN VG VI WF EH YE ZM ZW".split(" ");
+
+        function getCountryList(lang) {
+            let en, loc;
+            try { en = new Intl.DisplayNames(['en'], { type: 'region' }); } catch (e) { en = null; }
+            try { loc = new Intl.DisplayNames([lang], { type: 'region' }); } catch (e) { loc = en; }
+            const list = [];
+            COUNTRY_CODES.forEach(code => {
+                try {
+                    const enName = en ? en.of(code) : null;
+                    const locName = loc ? loc.of(code) : enName;
+                    if (enName && enName !== code) list.push({ value: enName, label: locName && locName !== code ? locName : enName });
+                } catch (e) { /* unsupported code in this browser */ }
+            });
+            list.sort((a, b) => a.label.localeCompare(b.label, lang));
+            list.push({ value: 'Other', label: t('other') });
+            return list;
+        }
+
+        function populateCountrySelects() {
+            const list = getCountryList(currentLang);
+            ['auth-country', 'setting-country'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const prev = sel.value || (currentUser && currentUser.country) || 'United Kingdom';
+                sel.innerHTML = list.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+                sel.value = list.some(c => c.value === prev) ? prev : 'United Kingdom';
+            });
+        }
+
+        /* ============================================================
+           LANGUAGE APPLY
+        ============================================================ */
+        function applyLanguage() {
+            document.documentElement.lang = currentLang;
+            document.getElementById('lang-select').value = currentLang;
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+            document.getElementById('lang-select').title = t('language');
+            document.getElementById('lang-select').setAttribute('aria-label', t('language'));
+            populateCountrySelects();
+        }
+
+        function setLanguage(lang) {
+            if (!SUPPORTED_LANGS.includes(lang)) lang = 'en';
+            currentLang = lang;
+            localStorage.setItem('tcd_lang', lang);
+            applyLanguage();
+            refreshDynamicViews();
+        }
+
+        function refreshDynamicViews() {
+            updateAuthUI();
+            renderSidebar();
+            setupTimeMachineOptions();
+            if (document.getElementById('user-area-view').style.display === 'block') renderUserAreaContent();
+            else if (document.getElementById('mod-page-view').style.display === 'block') renderModPageContent();
+            else if (currentMainTab === 'leaderboard') renderLeaderboardView();
+            else if (selectedLevelId) selectLevel(selectedLevelId);
+            else if (levels.length === 0) renderEmptyState();
+        }
+
+        /* ============================================================
+           INIT
+        ============================================================ */
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentLang = detectLanguage();
+            applyLanguage();
+            document.getElementById('api-doc-url').textContent = 'GET ' + API_URL + '/data';
+            await handleDiscordCallback();
+            await loadData();
+            saveSnapshotToday();
+            updateAuthUI();
+            renderSidebar();
+            renderSideModsList();
+            setupTimeMachineOptions();
+            if (levels.length > 0) selectLevel(levels[0].id);
+            else if (dataLoaded) renderEmptyState();
+            else renderLoadError();
+            if (pendingSettings && currentUser) openSettingsModal();
+        });
+
+        async function loadData() {
+            try {
+                const d = await api('/data');
+                levels = d.levels || [];
+                submissions = d.submissions || [];
+                modNames = d.mods || [];
+                currentUser = d.me || null;
+                if (!d.me && sessionToken) { // expired or invalid session
+                    sessionToken = null;
+                    localStorage.removeItem('tcd_token');
+                }
+                dataLoaded = true;
+                return true;
+            } catch (e) {
+                console.error('Load error:', e);
+                return false;
+            }
+        }
+
+        async function afterChange() {
+            await loadData();
+            renderSideModsList();
+            refreshDynamicViews();
+        }
+
+        async function setSession(res) {
+            sessionToken = res.token;
+            localStorage.setItem('tcd_token', res.token);
+            await afterChange();
+        }
+
+        function renderLoadError() {
+            document.getElementById('main-panel-content').innerHTML = `
+                <div style="text-align:center; padding:3rem 1rem;">
+                    <h2>⚠️ Could not load the list</h2>
+                    <p style="color:var(--text-muted); margin-top:0.5rem;">The server did not respond. Please try again in a moment.</p>
+                    <button class="primary" style="margin-top:1rem;" onclick="retryLoad()">Retry</button>
+                </div>`;
+        }
+
+        async function retryLoad() {
+            if (await loadData()) {
+                updateAuthUI(); renderSidebar(); renderSideModsList(); setupTimeMachineOptions();
+                if (levels.length) selectLevel(levels[0].id); else renderEmptyState();
+            }
+        }
+
+        function saveSnapshotToday() {
+            if (!dataLoaded || !levels.length) return; // never snapshot a failed/empty load
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (!snapshots[todayStr]) {
+                snapshots[todayStr] = JSON.parse(JSON.stringify(levels));
+                localStorage.setItem('tcd_snapshots', JSON.stringify(snapshots));
+            }
+        }
+
+        function setupTimeMachineOptions() {
+            const sel = document.getElementById('timemachine-date-select');
+            sel.innerHTML = '<option value="today">Today (Live List)</option>';
+            Object.keys(snapshots).sort().reverse().forEach(dateKey => {
+                sel.innerHTML += `<option value="${esc(dateKey)}">${esc(dateKey)}</option>`;
+            });
+        }
+
+        function renderTimeMachineSnapshot() {
+            const dateVal = document.getElementById('timemachine-date-select').value;
+            const container = document.getElementById('timemachine-content');
+
+            if (dateVal === 'today') {
+                container.innerHTML = `
+                    <h3 style="color:var(--accent);">📍 Currently viewing Live List</h3>
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.5rem;">Total Levels: <strong>${levels.length}</strong></p>
+                `;
+                return;
+            }
+
+            const snapLevels = snapshots[dateVal] || [];
+            const currentNames = levels.map(l => l.name);
+            const snapNames = snapLevels.map(l => l.name);
+
+            const newAdded = levels.filter(l => !snapNames.includes(l.name));
+            const removed = snapLevels.filter(l => !currentNames.includes(l.name));
+            const d = esc(dateVal);
+
+            container.innerHTML = `
+                <h3 style="color:var(--accent); margin-bottom:0.5rem;">📅 Snapshot: ${d}</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Total levels on this date: <strong>${snapLevels.length}</strong></p>
+
+                <h4 style="font-size:0.9rem; margin-top:0.5rem;">✨ Changes Since ${d}:</h4>
+                <ul style="padding-left:1.25rem; font-size:0.85rem; color:var(--text-main); margin-top:0.35rem; line-height:1.5;">
+                    <li><strong>${newAdded.length}</strong> new level(s) added since this date. ${newAdded.length ? `(${newAdded.map(l => esc(l.name)).join(', ')})` : ''}</li>
+                    <li><strong>${removed.length}</strong> level(s) removed or moved to legacy. ${removed.length ? `(${removed.map(l => esc(l.name)).join(', ')})` : ''}</li>
+                </ul>
+
+                <div style="margin-top:1rem; border-top:1px solid var(--border-color); padding-top:0.75rem;">
+                    <h4 style="font-size:0.9rem; margin-bottom:0.5rem;">🏆 Top 5 Levels on ${d}:</h4>
+                    <ol style="padding-left:1.25rem; font-size:0.85rem; color:var(--text-muted);">
+                        ${snapLevels.slice(0, 5).map(l => `<li><strong>#${esc(l.rank)} - ${esc(l.name)}</strong> by ${esc(l.creator)}</li>`).join('')}
+                    </ol>
+                </div>
+            `;
+        }
+
+        function renderSideModsList() {
+            const container = document.getElementById('side-mods-display');
+            if (modNames.length > 0) {
+                container.innerHTML = modNames.map(m => `<div class="side-mod-item">${esc(m)}</div>`).join('');
+            } else {
+                container.innerHTML = `<div class="side-mod-item">TinyDoggie</div>`;
+            }
+        }
+
+        /* ============================================================
+           DISCORD LOGIN (the worker verifies the token with Discord)
+        ============================================================ */
+        function loginWithDiscord() {
+            const scope = encodeURIComponent('identify');
+            const redirect = encodeURIComponent(DISCORD_REDIRECT_URI);
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${redirect}&response_type=token&scope=${scope}`;
+        }
+
+        async function handleDiscordCallback() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+            if (!accessToken) return;
+            window.history.replaceState({}, document.title, window.location.pathname); // remove the token from the address bar
+            try {
+                const res = await api('/discord', { accessToken });
+                sessionToken = res.token;
+                localStorage.setItem('tcd_token', res.token);
+                if (res.created) pendingSettings = true; // new account: let them pick a country
+                alert(`${t('aSigned')} ${res.me.username}`);
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+
+        /* ============================================================
+           USER AREA
+        ============================================================ */
+        function hideAllViews() {
+            document.getElementById('main-container').style.display = 'none';
+            document.getElementById('mod-page-view').style.display = 'none';
+            document.getElementById('user-area-view').style.display = 'none';
+        }
+
+        function showUserAreaPage() {
+            hideAllViews();
+            document.getElementById('user-area-view').style.display = 'block';
+            renderUserAreaContent();
+        }
+
+        function exitUserAreaPage() {
+            document.getElementById('user-area-view').style.display = 'none';
+            document.getElementById('main-container').style.display = 'grid';
+        }
+
+        function renderUserAreaContent() {
+            const container = document.getElementById('user-area-content');
+
+            if (!currentUser) {
+                container.innerHTML = `
+                    <div class="user-profile-box" style="text-align:center;">
+                        <h2>${t('notSignedIn')}</h2>
+                        <p style="color:var(--text-muted); margin: 1rem 0;">Please log in or sign in with Discord to access your Tiny TCD List user area account profile.</p>
+                        <button class="primary" onclick="openModal('auth-modal')">${t('loginRegister')}</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const isStaff = currentUser.isMod === true;
+            const userYt = currentUser.youtube || `https://youtube.com/@${encodeURIComponent(currentUser.username)}`;
+
+            container.innerHTML = `
+                <div class="user-area-layout">
+                    <div class="user-profile-box">
+                        <div class="user-profile-title">${t('profile')} - ${esc(currentUser.username)}</div>
+
+                        <div class="user-field-group">
+                            <div class="user-field-title">${t('username')}: <span style="font-weight:400; color:var(--text-muted);">${esc(currentUser.username)}</span></div>
+                            <div class="user-field-desc">The name you registered under and which you use to log in to Tiny TCD List.</div>
+                        </div>
+
+                        <div class="user-field-group">
+                            <div class="user-field-title">🌍 ${t('country')}: <span style="font-weight:400; color:var(--text-muted);">${esc(currentUser.country || '-')}</span>
+                                <button onclick="openSettingsModal()" style="margin-left:0.5rem;">✏️ ${t('settings')}</button>
+                            </div>
+                        </div>
+
+                        <div class="user-field-group">
+                            <div class="user-field-title">✏️ YouTube: <a href="${esc(userYt)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:none;">🔗 Link</a></div>
+                            <div class="user-field-desc">A link to your YouTube channel, if you have one.</div>
+                        </div>
+
+                        <div class="user-field-group">
+                            <div class="user-field-title">${t('permissions')}</div>
+                            <div class="user-field-desc">
+                                <strong style="color:${isStaff ? 'var(--accent)' : 'var(--text-muted)'};">[ ${isStaff ? t('listModStaff') : t('standardMember')} ]</strong>
+                            </div>
+                        </div>
+
+                        <button class="btn-danger-large" onclick="deleteAccountAction()">${t('deleteAccount')}</button>
+                    </div>
+
+                    <div>
+                        <div class="user-side-box">
+                            <h3>${t('logout')}</h3>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">${t('logoutDesc')}</p>
+                            <button class="btn-danger-large" style="width:100%; margin-top:0;" onclick="logout()">${t('logout')}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function deleteAccountAction() {
+            if (!currentUser) return;
+            if (!confirm("Are you sure you want to delete your Tiny TCD List account? This action cannot be undone.")) return;
+            try {
+                await api('/delete-account', {});
+                sessionToken = null;
+                localStorage.removeItem('tcd_token');
+                alert("Your account has been deleted.");
+                exitUserAreaPage();
+                await afterChange();
+            } catch (e) { alert(e.message); }
+        }
+
+        function openSettingsModal() {
+            if (!currentUser) return;
+            populateCountrySelects();
+            document.getElementById('setting-username').value = currentUser.username;
+            document.getElementById('setting-country').value = currentUser.country || "United Kingdom";
+            openModal('settings-modal');
+        }
+
+        async function saveUserSettings() {
+            if (!currentUser) return;
+            const newName = document.getElementById('setting-username').value.trim();
+            const newCountry = document.getElementById('setting-country').value;
+            if (!newName) return alert("Username cannot be empty.");
+            try {
+                const res = await api('/profile', { username: newName, country: newCountry });
+                await setSession(res);
+                closeModal('settings-modal');
+                alert(t('save') + " ✔");
+            } catch (e) { alert(e.message); }
+        }
+
+        async function claimPreviousVerification() {
+            if (!currentUser) return alert("Please log in first.");
+            const oldUser = document.getElementById('claim-old-user').value.trim();
+            const oldPass = document.getElementById('claim-old-pass').value;
+            const targetLevelId = document.getElementById('claim-level-id').value.trim();
+            if (!oldUser || !oldPass || !targetLevelId) return alert("Fill in the old username, old password and Level ID.");
+            try {
+                const res = await api('/claim', { oldUsername: oldUser, oldPassword: oldPass, levelId: targetLevelId });
+                alert(`Successfully claimed verification for level: ${res.level}!`);
+                closeModal('settings-modal');
+                await afterChange();
+            } catch (e) { alert(e.message); }
+        }
+
+        /* ============================================================
+           YOUTUBE HELPERS / POINTS
+        ============================================================ */
+        function getYouTubeVideoId(url) {
+            if (!url) return null;
+            let match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            return match ? match[1] : null;
+        }
+
+        function getYouTubeThumbnailUrl(url) {
+            const id = getYouTubeVideoId(url);
+            return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : 'https://via.placeholder.com/120x90?text=No+Thumb';
+        }
+
+        function calculatePoints(rank) {
+            if (rank > 150) return 0;
+            const maxPts = 350;
+            let pts = maxPts * Math.pow((151 - rank) / 150, 1.85);
+            if (rank === 1) pts = 350;
+            if (rank === 150) pts = 18.71;
+            return Math.round(pts * 100) / 100;
+        }
+
+        /* ============================================================
+           MAIN VIEWS
+        ============================================================ */
+        function switchMainTab(tab) {
+            currentMainTab = tab;
+            document.getElementById('nav-list-btn').classList.toggle('primary', tab === 'list');
+            document.getElementById('nav-lb-btn').classList.toggle('primary', tab === 'leaderboard');
+            const container = document.getElementById('main-container');
+            document.getElementById('user-area-view').style.display = 'none';
+            document.getElementById('mod-page-view').style.display = 'none';
+            container.style.display = 'grid';
+            if (tab === 'list') {
+                container.style.gridTemplateColumns = '';
+                document.getElementById('sidebar-container').style.display = 'flex';
+                document.getElementById('right-sidebar-container').style.display = 'flex';
+                if (levels.length > 0) selectLevel(selectedLevelId || levels[0].id);
+            } else {
+                container.style.gridTemplateColumns = '1fr';
+                document.getElementById('sidebar-container').style.display = 'none';
+                document.getElementById('right-sidebar-container').style.display = 'none';
+                renderLeaderboardView();
+            }
+        }
+
+        function switchListCategory(cat) {
+            currentCategory = cat;
+            ['main', 'extended', 'leg'].forEach(c => document.getElementById(`tab-${c}`).classList.remove('active'));
+            document.getElementById(`tab-${cat}`).classList.add('active');
+            renderSidebar();
+        }
+
+        function getFilteredLevels() {
+            return levels.filter(l => {
+                if (currentCategory === 'main') return l.rank >= 1 && l.rank <= 75;
+                if (currentCategory === 'extended') return l.rank >= 76 && l.rank <= 150;
+                if (currentCategory === 'leg') return l.rank > 150;
+                return false;
+            }).sort((a, b) => a.rank - b.rank);
+        }
+
+        function renderSidebar() {
+            const listEl = document.getElementById('level-items-list');
+            const query = document.getElementById('level-search-input').value.toLowerCase();
+            const filtered = getFilteredLevels().filter(l => String(l.name).toLowerCase().includes(query));
+
+            listEl.innerHTML = filtered.length ? filtered.map(l => `
+                <div class="level-item ${selectedLevelId === l.id ? 'active' : ''}" onclick="selectLevel(${Number(l.id)})">
+                    <img src="${esc(getYouTubeThumbnailUrl(l.video))}" class="level-thumb-mini" alt="thumb">
+                    <div>
+                        <strong>#${esc(l.rank)} - ${esc(l.name)}</strong>
+                        <span style="font-size:0.8rem; color:var(--text-muted); display:block;">${esc(l.creator)}</span>
+                    </div>
+                </div>
+            `).join('') : `<div style="padding: 1rem; color: var(--text-muted); text-align:center;">${t('noLevelsList')}</div>`;
+        }
+
+        function filterLevels() { renderSidebar(); }
+
+        function renderEmptyState() {
+            document.getElementById('main-panel-content').innerHTML = `
+                <div class="empty-panel" style="text-align:center; padding: 3rem 1rem;">
+                    <h2>${t('noLevelsTitle')}</h2>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem;">${t('noLevelsDesc')}</p>
+                </div>
+            `;
+        }
+
+        function selectLevel(id) {
+            selectedLevelId = id;
+            renderSidebar();
+            const level = levels.find(l => l.id === id);
+            if (!level) return renderEmptyState();
+
+            const completions = level.completions || [];
+            const vid = getYouTubeVideoId(level.video);
+            const panel = document.getElementById('main-panel-content');
+            panel.innerHTML = `
+                <div class="level-header">
+                    <div>
+                        <h1>#${esc(level.rank)} - ${esc(level.name)}</h1>
+                        <p style="color: var(--text-muted)">${t('createdBy')} ${esc(level.creator)} | ${t('verifiedBy')} ${esc(level.verifier)}</p>
+                    </div>
+                    <div>
+                        ${currentUser && currentUser.isMod ? `<button class="primary" onclick="openModModal()">🛠️ ${t('modPanel')}</button>` : ''}
+                    </div>
+                </div>
+
+                ${vid ? `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe></div>` : ''}
+
+                <div class="meta-grid">
+                    <div class="meta-card"><label>${t('listPoints')}</label><value style="color: var(--accent); font-weight:bold;">${calculatePoints(level.rank)} pts</value></div>
+                    <div class="meta-card"><label>${t('levelId')}</label><value>${esc(level.levelId)}</value></div>
+                    <div class="meta-card"><label>${t('difficulty')}</label><value>${esc(level.difficulty)}</value></div>
+                    <div class="meta-card"><label>${t('gdUpdate')}</label><value>${esc(level.update)}</value></div>
+                    <div class="meta-card"><label>${t('song')}</label><value>${esc(level.song)}</value></div>
+                    <div class="meta-card"><label>${t('objects')}</label><value>${esc(level.objects || 'N/A')}</value></div>
+                    <div class="meta-card"><label>${t('listReq')}</label><value>${esc(level.reqPercent)}%</value></div>
+                </div>
+
+                <h3 class="section-title">${t('completions')} (${completions.length})</h3>
+                <ul class="completions-list">
+                    ${completions.length ? completions.map(c => `
+                        <li class="completion-item">
+                            <div><strong>${esc(c.player)}</strong> (${esc(c.country)}) - <strong>${esc(c.percent)}%</strong></div>
+                            <a href="${esc(safeUrl(c.video))}" target="_blank" rel="noopener noreferrer" class="btn">${t('proofVideo')}</a>
+                        </li>
+                    `).join('') : `<li style="color: var(--text-muted);">${t('noCompletions')}</li>`}
+                </ul>
+            `;
+        }
+
+        function renderLeaderboardView() {
+            const panel = document.getElementById('main-panel-content');
+            let playerScores = {};
+
+            levels.forEach(l => {
+                const pts = calculatePoints(l.rank);
+
+                if (l.verifier) {
+                    if (!playerScores[l.verifier]) {
+                        playerScores[l.verifier] = { name: l.verifier, country: "Other", points: 0, completions: 0 };
+                    }
+                    playerScores[l.verifier].points += pts;
+                }
+
+                (l.completions || []).forEach(c => {
+                    if (c.percent >= l.reqPercent) {
+                        if (!playerScores[c.player]) {
+                            playerScores[c.player] = { name: c.player, country: c.country, points: 0, completions: 0 };
+                        }
+                        if (c.player !== l.verifier) {
+                            playerScores[c.player].points += pts;
+                        }
+                        playerScores[c.player].completions++;
+                    }
+                });
+            });
+
+            let sortedPlayers = Object.values(playerScores).sort((a, b) => b.points - a.points);
+            panel.innerHTML = `
+                <h2>${t('playerLeaderboards')}</h2>
+                <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+                    <thead>
+                        <tr style="text-align:left; border-bottom:1px solid var(--border-color); color:var(--text-muted); font-size:0.85rem;">
+                            <th style="padding:0.75rem;">${t('rank')}</th>
+                            <th style="padding:0.75rem;">${t('player')}</th>
+                            <th style="padding:0.75rem;">${t('country').toUpperCase()}</th>
+                            <th style="padding:0.75rem;">${t('completions').toUpperCase()}</th>
+                            <th style="padding:0.75rem;">${t('points')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedPlayers.length ? sortedPlayers.map((p, idx) => `
+                            <tr style="border-bottom:1px solid var(--border-color);">
+                                <td style="padding:0.75rem;">#${idx + 1}</td>
+                                <td style="padding:0.75rem;"><strong>${esc(p.name)}</strong></td>
+                                <td style="padding:0.75rem;">${esc(p.country)}</td>
+                                <td style="padding:0.75rem;">${p.completions}</td>
+                                <td style="padding:0.75rem; color: var(--accent); font-weight: bold;">${Math.round(p.points * 100) / 100} pts</td>
+                            </tr>
+                        `).join('') : `<tr><td colspan="5" style="padding:1rem; color: var(--text-muted);">${t('noRecords')}</td></tr>`}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        /* ============================================================
+           AUTH UI (also toggles the top mod bar)
+        ============================================================ */
+        function updateAuthUI() {
+            const area = document.getElementById('user-auth-area');
+            if (currentUser) {
+                area.innerHTML = `
+                    <div class="user-pill" style="display:flex; gap:0.5rem; align-items:center;">
+                        <button onclick="showUserAreaPage()">👤 ${esc(currentUser.username)} ${currentUser.isMod ? '🛡️' : ''}</button>
+                        <button onclick="logout()">${t('logout')}</button>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `<button onclick="openModal('auth-modal')">${t('loginRegister')}</button>`;
+            }
+            document.getElementById('mod-bar').style.display = (currentUser && currentUser.isMod) ? 'flex' : 'none';
+        }
+
+        async function handleRegister() {
+            const u = document.getElementById('auth-username').value.trim();
+            const p = document.getElementById('auth-password').value;
+            const c = document.getElementById('auth-country').value;
+            if (!u || !p) return alert(t('aFill'));
+            try {
+                await setSession(await api('/register', { username: u, password: p, country: c }));
+                document.getElementById('auth-password').value = '';
+                closeModal('auth-modal');
+            } catch (e) { alert(e.message); }
+        }
+
+        async function handleLogin() {
+            const u = document.getElementById('auth-username').value.trim();
+            const p = document.getElementById('auth-password').value;
+            if (!u || !p) return alert(t('aFill'));
+            try {
+                await setSession(await api('/login', { username: u, password: p }));
+                document.getElementById('auth-password').value = '';
+                closeModal('auth-modal');
+            } catch (e) { alert(e.message === 'Invalid credentials.' ? t('aInvalid') : e.message); }
+        }
+
+        async function logout() {
+            const wasOnModPage = document.getElementById('mod-page-view').style.display === 'block';
+            sessionToken = null;
+            localStorage.removeItem('tcd_token');
+            currentUser = null;
+            await loadData(); // clears the mod-only data
+            updateAuthUI();
+            renderSideModsList();
+            if (wasOnModPage) exitModPage(); else refreshDynamicViews();
+        }
+
+        /* ============================================================
+           SUBMISSIONS
+        ============================================================ */
+        function toggleSubmissionType() {
+            const type = document.getElementById('sub-type').value;
+            const isLevelSub = (type === 'tiny-level' || type === 'level');
+            document.getElementById('sub-level-fields').style.display = isLevelSub ? 'block' : 'none';
+            document.getElementById('sub-record-fields').style.display = isLevelSub ? 'none' : 'block';
+
+            if (!isLevelSub) {
+                document.getElementById('sr-level-select').innerHTML = levels.map(l => `<option value="${Number(l.id)}">#${esc(l.rank)} - ${esc(l.name)}</option>`).join('');
+            }
+        }
+
+        async function submitEntry() {
+            if (!currentUser) {
+                closeModal('submit-modal');
+                alert('Please log in to submit.');
+                openModal('auth-modal');
+                return;
+            }
+            if (!document.getElementById('sub-clicks').checked) return alert(t('audioClicks'));
+
+            const type = document.getElementById('sub-type').value;
+            let body = { type };
+
+            if (type === 'tiny-level' || type === 'level') {
+                body.name = document.getElementById('sl-name').value;
+                body.levelId = document.getElementById('sl-id').value;
+                body.creator = document.getElementById('sl-creator').value;
+                body.verifier = document.getElementById('sl-verifier').value;
+                body.difficulty = document.getElementById('sl-diff').value;
+                body.update = document.getElementById('sl-update').value;
+                body.song = document.getElementById('sl-song').value;
+                body.length = document.getElementById('sl-length').value;
+                body.objects = document.getElementById('sl-objects').value;
+                body.password = document.getElementById('sl-pass').value;
+                body.reqPercent = parseInt(document.getElementById('sl-req').value) || 70;
+                body.video = document.getElementById('sl-video').value;
+            } else {
+                body.levelIdTarget = parseInt(document.getElementById('sr-level-select').value);
+                body.percent = parseInt(document.getElementById('sr-percent').value);
+                body.video = document.getElementById('sr-video').value;
+            }
+
+            try {
+                await api('/submit', body);
+                closeModal('submit-modal');
+                alert(t('aSubmitted'));
+                await afterChange();
+            } catch (e) { alert(e.message); }
+        }
+
+        /* ============================================================
+           MOD DASHBOARD (the worker re-checks every action)
+        ============================================================ */
+        function openModModal() {
+            if (!currentUser) return openModal('auth-modal');
+            if (!requireMod()) return;
+            showModPage();
+        }
+
+        function showModPage() {
+            if (!requireMod()) return;
+            hideAllViews();
+            document.getElementById('mod-page-view').style.display = 'block';
+            renderModPageContent();
+        }
+
+        function exitModPage() {
+            document.getElementById('mod-page-view').style.display = 'none';
+            document.getElementById('main-container').style.display = 'grid';
+            renderSidebar();
+            renderSideModsList();
+            if (levels.length > 0) selectLevel(levels[0].id);
+        }
+
+        function renderModPageContent() {
+            document.getElementById('mod-page-pending-list').innerHTML = submissions.length ? submissions.map((s, idx) => `
+                <div style="background:var(--panel-bg); padding:1rem; border-radius:6px; border:1px solid var(--border-color);">
+                    <p><strong>Type:</strong> ${esc(String(s.type).toUpperCase())} | <strong>By:</strong> ${esc(s.user)}</p>
+                    ${(s.type === 'tiny-level' || s.type === 'level')
+                        ? `<p><strong>Level:</strong> ${esc(s.name)} (ID:${esc(s.levelId)})</p>`
+                        : `<p><strong>Record:</strong> #${esc(s.levelIdTarget)} - ${esc(s.percent)}%</p>`}
+                    ${s.video ? `<p><a href="${esc(safeUrl(s.video))}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">${t('proofVideo')}</a></p>` : ''}
+                    <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+                        <button class="primary" onclick="approveSubmission(${idx})">${t('accept')}</button>
+                        <button onclick="rejectSubmission(${idx})" style="background:var(--danger); border-color:var(--danger)">${t('reject')}</button>
+                    </div>
+                </div>
+            `).join('') : `<p style="color:var(--text-muted)">${t('noPending')}</p>`;
+
+            document.getElementById('mod-staff-directory').innerHTML = modNames.length ? modNames.map(m => `
+                <div class="mod-user-card">
+                    <span style="font-size:1.5rem;">🛡️</span>
+                    <div>
+                        <strong>${esc(m)}</strong>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Discord Linked</div>
+                    </div>
+                </div>
+            `).join('') : `<p style="color:var(--text-muted)">${t('noMods')}</p>`;
+
+            const sortedLevels = [...levels].sort((a, b) => a.rank - b.rank);
+            document.getElementById('mod-page-level-list').innerHTML = sortedLevels.length ? sortedLevels.map((l, idx) => `
+                <div class="mod-editor-card">
+                    <div><strong>#${esc(l.rank)} - ${esc(l.name)}</strong><div style="font-size:0.8rem; color:var(--text-muted)">ID: ${esc(l.levelId)}</div></div>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button onclick="moveLevel(${Number(l.id)}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆</button>
+                        <button onclick="moveLevel(${Number(l.id)}, 1)" ${idx === sortedLevels.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇</button>
+                        <button onclick="deleteLevel(${Number(l.id)})" style="background:var(--danger); border-color:var(--danger)">🗑️</button>
+                    </div>
+                </div>
+            `).join('') : `<p style="color:var(--text-muted)">${t('noLevelsPub')}</p>`;
+        }
+
+        async function modAction(payload) {
+            if (!requireMod()) return null;
+            try {
+                const res = await api('/mod', payload);
+                await loadData();
+                renderSideModsList();
+                renderSidebar();
+                if (document.getElementById('mod-page-view').style.display === 'block') renderModPageContent();
+                return res;
+            } catch (e) {
+                alert(e.message);
+                if (e.status === 409) { await loadData(); renderModPageContent(); }
+                return null;
+            }
+        }
+
+        async function readdLevelDirect() {
+            const val = id => document.getElementById(id).value.trim();
+            const res = await modAction({
+                action: 'readd',
+                name: val('readd-name'), levelId: val('readd-id'), creator: val('readd-creator'),
+                verifier: val('readd-verifier'), difficulty: document.getElementById('readd-diff').value,
+                update: val('readd-update'), song: val('readd-song'), length: val('readd-length'),
+                objects: val('readd-objects'), password: val('readd-pass'),
+                rank: parseInt(val('readd-rank')) || 1, reqPercent: parseInt(val('readd-req')) || 100,
+                video: val('readd-video')
+            });
+            if (res && res.ok) {
+                selectLevel(res.id);
+                alert(`Successfully restored/re-added level: ${val('readd-name')}!`);
+            }
+        }
+
+        async function moveLevel(id, direction) {
+            await modAction({ action: 'move', id, direction });
+        }
+
+        async function deleteLevel(id) {
+            if (!requireMod()) return;
+            const passcode = prompt("🔒 Enter deletion passcode required to delete this level:");
+            if (passcode === null) return;
+            const res = await modAction({ action: 'delete', id, passcode });
+            if (res && res.ok) alert("Level successfully deleted.");
+        }
+
+        async function approveSubmission(idx) {
+            const s = submissions[idx];
+            if (!s) return;
+            await modAction({ action: 'approve', index: idx, user: s.user, type: s.type });
+        }
+
+        async function rejectSubmission(idx) {
+            const s = submissions[idx];
+            if (!s) return;
+            await modAction({ action: 'reject', index: idx, user: s.user, type: s.type });
+        }
+    </script>
+</body>
+</html>
